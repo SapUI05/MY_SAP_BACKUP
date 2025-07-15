@@ -1,0 +1,73 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Dell
+*&  DEPT        : SD
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 14th JULY 2025
+*&  END DATE    : 14th JULY 2025
+*&  PURPOSE     : Application to showcase boilerplate
+*&                for using user Command and ModIf ID
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_user_cmd_modif_id_basic NO STANDARD PAGE HEADING.
+
+************************************************************************
+**Main Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK main_selector WITH FRAME TITLE text-001.
+PARAMETERS: p_sales   RADIOBUTTON GROUP sel,
+            p_deliv   RADIOBUTTON GROUP sel,
+            p_bill RADIOBUTTON GROUP sel.
+SELECTION-SCREEN END OF BLOCK main_selector.
+
+************************************************************************
+**Sales Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK sales_blk WITH FRAME TITLE text-sls.
+PARAMETERS: p_vdoc  TYPE vbak-vbeln     MODIF ID sls,
+            p_vbnam TYPE vbak-ernam     MODIF ID sls,
+            p_vbdat TYPE vbak-erdat     MODIF ID sls,
+            p_vbzet TYPE vbak-erzet     MODIF ID sls,
+            p_vbcat TYPE vbak-vbtyp     MODIF ID sls,
+            p_vbtyp TYPE vbak-auart     MODIF ID sls,
+            p_vb_sp TYPE vbak-kunnr     MODIF ID sls,
+            p_vb_bp TYPE vbak-bukrs_vf  MODIF ID sls,
+            p_vbnet TYPE vbak-netwr     MODIF ID sls,
+            p_vbcur TYPE vbak-waerk     MODIF ID sls.
+SELECTION-SCREEN END OF BLOCK sales_blk.
+
+************************************************************************
+**Delivery Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK logist_blk WITH FRAME TITLE text-log.
+PARAMETERS: p_lidoc   TYPE likp-vbeln MODIF ID lgs,
+            p_linam   TYPE likp-ernam MODIF ID lgs,
+            p_lidat   TYPE likp-erdat MODIF ID lgs,
+            p_lizet   TYPE likp-erzet MODIF ID lgs,
+            p_li_sp   TYPE likp-kunag MODIF ID lgs,
+            p_lityp   TYPE likp-lfart MODIF ID lgs,
+            p_li_sh   TYPE likp-kunnr MODIF ID lgs,
+            p_linet   TYPE likp-netwr MODIF ID lgs,
+            p_licur   TYPE likp-waerk MODIF ID lgs.
+SELECTION-SCREEN END OF BLOCK logist_blk.
+
+************************************************************************
+**Billing Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK bill_blk WITH FRAME TITLE text-blk.
+PARAMETERS: p_bdoc  TYPE vbrk-vbeln MODIF ID bll,
+            p_bnam  TYPE vbrk-ernam MODIF ID bll,
+            p_bdat  TYPE vbrk-erdat MODIF ID bll,
+            p_bzet  TYPE vbrk-erzet MODIF ID bll,
+            p_b_sp  TYPE vbrk-kunag MODIF ID bll,
+            p_btyp  TYPE vbrk-fkart MODIF ID bll,
+            p_bpyr  TYPE vbrk-kunrg MODIF ID bll,
+            p_bnet  TYPE vbrk-netwr MODIF ID bll,
+            p_bng   TYPE vbrk-waerk MODIF ID bll.
+SELECTION-SCREEN END OF BLOCK bill_blk.
+
+AT SELECTION-SCREEN OUTPUT.
+  "Code to hide and unhide selection planes

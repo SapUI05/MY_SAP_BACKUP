@@ -1,0 +1,69 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Tangent
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 13TH JULY 2025
+*&  END DATE    : 13TH JULY 2025
+*&  PURPOSE     : Sample Application to demonstrate PARAMETERS KEYWORDS
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_parameters_keywords NO STANDARD PAGE HEADING.
+
+**Selection Screen
+**Get Parameters
+
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE text-001.
+
+PARAMETERS : p_eid   TYPE c       LENGTH 6  NO-DISPLAY,
+             p_etp   TYPE c       LENGTH 8  OBLIGATORY,
+             p_name  TYPE c       LENGTH 60 LOWER CASE VISIBLE LENGTH 15,
+             p_phone TYPE c       LENGTH 25 VISIBLE LENGTH 12,
+             p_dob   TYPE date,
+             p_ctry  TYPE c       LENGTH 2  DEFAULT 'IN',
+             p_vsatp AS LISTBOX   VISIBLE LENGTH 16,
+             p_vsaid TYPE c       LENGTH 12,
+             p_vsaex TYPE d,
+             p_mcc   TYPE c       LENGTH 6 MATCHCODE OBJECT debia,
+             p_sal   TYPE i       VISIBLE LENGTH 75,
+             p_reg   RADIOBUTTON  GROUP ept,
+             p_cont  RADIOBUTTON  GROUP ept,
+             p_secid TYPE c       LENGTH 10.
+
+SELECTION-SCREEN END OF BLOCK b1.
+
+
+************************************************************************
+**Print table
+
+WRITE : sy-uline(80),                                                                               " Top border line
+        / sy-vline,       2 'Employee ID',        40 sy-vline,      42 p_eid,       80 sy-vline,    " Employee ID row
+        / sy-uline(80),                                                                           " Separator line
+        / sy-vline,       2 'Employee Type',      40 sy-vline,      42 p_etp,       80 sy-vline,    " Employee Type row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Employee Name',      40 sy-vline,      42 p_name,      80 sy-vline,    " Employee Name row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Employee Phone',     40 sy-vline,      42 p_phone,     80 sy-vline,    " Employee Phone row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Employee DOB',       40 sy-vline,      42 p_dob,       80 sy-vline,    " Employee DOB row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Employee Country',   40 sy-vline,      p_ctry ,        80 sy-vline,    " Employee Weight row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Visa Type',          40 sy-vline,      42 p_vsatp,     80 sy-vline,    " Employee Salary row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Visa ID No',         40 sy-vline,      42 p_vsaid,     80 sy-vline,    " Employee Salary row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Visa Expiry Date',   40 sy-vline,      42 p_vsaex,     80 sy-vline,    " Employee Salary row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Salary',             40 sy-vline,      42 p_sal,       80 sy-vline,    " Employee Salary row
+        / sy-uline(80),                                                                             " Separator line
+        / sy-vline,       2 'Sec ID',             40 sy-vline,      42 p_secid,     80 sy-vline,    " Employee SSID row
+        / sy-uline(80).

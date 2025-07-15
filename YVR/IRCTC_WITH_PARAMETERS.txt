@@ -1,0 +1,131 @@
+
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      . Ashhad
+*&  CLIENT      . Airtel
+*&  DEPT        . SD
+*&  MANAGER     . Ahmed
+*&  PACKAGE     . $TMP
+*&  TR          . -
+*&  START DATE  . 14TH JULY 2025
+*&  END DATE    . 14TH JULY 2025
+*&  PURPOSE     . -
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_irctc_with_parameters NO STANDARD PAGE HEADING.
+
+************************************************************************
+**Table Position variables
+
+SELECTION-SCREEN BEGIN OF BLOCK tb_param WITH FRAME TITLE text-tbl. "Table param
+PARAMETERS: p_lpos   TYPE i DEFAULT 20,
+            p_tbl_wt TYPE i DEFAULT 80.
+SELECTION-SCREEN END OF BLOCK tb_param.
+SELECTION-SCREEN SKIP.
+
+DATA : lv_hfl_wdh    TYPE i,
+       lv_first_ln   TYPE i,
+       lv_middle_ln  TYPE i,
+       lv_last_ln    TYPE i,
+       lv_head_txt   TYPE i,
+       lv_first_txt  TYPE i,
+       lv_second_txt TYPE i.
+
+lv_hfl_wdh  = p_tbl_wt / 2.
+
+lv_first_ln  = p_lpos.
+lv_middle_ln = p_lpos  + lv_hfl_wdh.
+lv_last_ln   = p_lpos  + p_tbl_wt - 1.
+
+
+lv_head_txt   = lv_first_ln   + 8.
+lv_first_txt  = lv_first_ln   + 2.
+lv_second_txt = lv_middle_ln  + 2.
+
+************************************************************************
+**Selection Screen
+
+SELECTION-SCREEN  BEGIN   OF BLOCK b1 WITH FRAME TITLE text-001.    "train details
+PARAMETERS:       p_from  TYPE  c     LENGTH 25  OBLIGATORY DEFAULT 'HYB',
+                  p_to    TYPE  c     LENGTH 25  OBLIGATORY DEFAULT 'BDHN',
+                  p_bdate TYPE  d     OBLIGATORY DEFAULT '20250714'.
+SELECTION-SCREEN  END     OF BLOCK b1.
+
+SELECTION-SCREEN BEGIN OF BLOCK styp WITH FRAME TITLE text-002. "seat type
+PARAMETERS: p_2a   RADIOBUTTON GROUP styp,
+            p_gnl  RADIOBUTTON GROUP styp,
+            p_slpr RADIOBUTTON GROUP styp,
+            p_2ac  RADIOBUTTON GROUP styp,
+            p_1ac  RADIOBUTTON GROUP styp,
+            p_3ac  RADIOBUTTON GROUP styp.
+SELECTION-SCREEN END OF BLOCK styp.
+
+SELECTION-SCREEN BEGIN OF BLOCK typ WITH FRAME TITLE text-003.  "ticket type
+PARAMETERS: p_treg RADIOBUTTON GROUP ttyp,
+            p_ttkl RADIOBUTTON GROUP ttyp,
+            p_tlds RADIOBUTTON GROUP ttyp,
+            p_tsnr RADIOBUTTON GROUP ttyp.
+SELECTION-SCREEN END OF BLOCK typ.
+
+SELECTION-SCREEN BEGIN OF BLOCK adn WITH FRAME TITLE text-004.  "addons
+PARAMETERS: p_mls   AS CHECKBOX,
+            p_water AS CHECKBOX,
+            p_bnl   AS CHECKBOX.
+SELECTION-SCREEN END OF BLOCK adn.
+
+
+************************************************************************
+**Selection Screen Output
+AT SELECTION-SCREEN OUTPUT.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_from.
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_to.
+
+START-OF-SELECTION.
+
+************************************************************************
+**Print Train Details
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          ' Train Details ',
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'From Station',    AT lv_second_txt p_from,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'To Station',      AT lv_second_txt p_to,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Boarding On',     AT lv_second_txt p_bdate,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+
+  SKIP 2.
+
+************************************************************************
+**Print Train Details
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          ' Train Details ',
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'From Station',    AT lv_second_txt p_from,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'To Station',      AT lv_second_txt p_to,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Boarding On',     AT lv_second_txt p_bdate,
+    AT lv_first_ln  sy-vline,               AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+
+  SKIP 2.
+
+************************************************************************
+**Print Seat Type
+  WRITE : sy-uline(80), 5   ' Seat Type ',            / sy-vline,   80 sy-vline.
+
+  WRITE : /0 sy-uline(80),    / sy-vline,     2 '2a  ',   80 sy-vline,    42 p_2a  ,
+          /0 sy-uline(80),    / sy-vline,     2 'gnl ',   80 sy-vline,    42 p_gnl ,
+          /0 sy-uline(80),    / sy-vline,     2 'slpr',   80 sy-vline,    42 p_slpr,
+          /0 sy-uline(80),    / sy-vline,     2 '2ac ',   80 sy-vline,    42 p_2ac ,
+          /0 sy-uline(80),    / sy-vline,     2 '1ac ',   80 sy-vline,    42 p_1ac ,
+          /0 sy-uline(80),    / sy-vline,     2 '3ac ',   80 sy-vline,    42 p_3ac ,
+          /0 sy-uline(80).

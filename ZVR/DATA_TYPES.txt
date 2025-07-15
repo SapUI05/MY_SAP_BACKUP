@@ -1,0 +1,97 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : ASHHAD
+*&  CLIENT      : RIL
+*&  DEPT        : SD
+*&  MANAGER     : AHMED
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 11TH JULY 2025
+*&  END DATE    : 12TH JULY 2025
+*&  PURPOSE     : To demonstrate data types
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+
+REPORT zvr_data_types.
+
+
+************************************************************************
+**  Init variables
+
+
+DATA : lv_int     TYPE i,
+       lv_float   TYPE f,
+       lv_packed  TYPE p,
+       lv_char    TYPE c,
+       lv_numchar TYPE n,
+       lv_dt1     TYPE date,
+       lv_dt2     TYPE d,
+       lv_tm1     TYPE time,
+       lv_str     TYPE string,
+       lv_tm2     TYPE t.
+
+************************************************************************
+**  Assigning variables
+
+
+lv_int = 123.
+lv_float = '45.67'.
+lv_packed = '8.9785'.
+lv_char = 'char'.
+lv_numchar = 'a12'.
+lv_dt1 = '07072025'.
+lv_dt2 = '31122024'.
+lv_tm1 = '092134'.
+lv_tm2 = '223344'.
+lv_str = 'SAP T-CODES'.
+
+
+************************************************************************
+**  Print out variables vertically
+
+
+WRITE / 'Color 1' COLOR 1.
+WRITE / 'Color 2' COLOR 2.
+WRITE / 'Color 3' COLOR 3.
+WRITE / 'Color 4' COLOR 4.
+WRITE / 'Color 5' COLOR 5.
+WRITE / 'Color 6' COLOR 6.
+
+WRITE / 'Color 1 INVERSE ON' COLOR 1 INVERSE ON.
+WRITE / 'Color 2 INVERSE ON' COLOR 2 INVERSE ON.
+WRITE / 'Color 3 INVERSE ON' COLOR 3 INVERSE ON.
+WRITE / 'Color 4 INVERSE ON' COLOR 4 INVERSE ON.
+WRITE / 'Color 5 INVERSE ON' COLOR 5 INVERSE ON.
+WRITE / 'Color 6 INVERSE ON' COLOR 6 INVERSE ON.
+
+************************************************************************
+**Printed Local Variables
+
+WRITE /:  lv_int,
+          lv_float,
+          lv_packed,
+          lv_char,
+          lv_numchar,
+          lv_dt1,
+          lv_dt2,
+          lv_tm1,
+          lv_tm2,
+          lv_str.
+
+*************************************************************************
+***  Declaration of variables
+*
+*DATA lv_int TYPE i.
+*DATA lv_float TYPE f.
+*DATA lv_packed TYPE p.
+*DATA lv_char TYPE c.
+*DATA lv_numchar TYPE n.
+*DATA lv_dt1 TYPE date.
+*DATA lv_dt2 TYPE d.
+*DATA lv_tm1 TYPE time.
+*DATA lv_tm2 TYPE t.

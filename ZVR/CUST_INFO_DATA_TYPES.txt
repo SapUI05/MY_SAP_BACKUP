@@ -1,0 +1,86 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : ASHHAD
+*&  CLIENT      : ADANI
+*&  DEPT        : SD
+*&  MANAGER     : AHMED
+*&  PACKAGE     : @TMP
+*&  TR          : -
+*&  START DATE  : 12TH JUNE 2025
+*&  END DATE    : 12TH JULY 2025
+*&  PURPOSE     : Use data
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+
+REPORT zvr_cust_info_data_types NO STANDARD PAGE HEADING.
+
+************************************************************************
+**Declaration
+
+DATA : lv_cid    TYPE c LENGTH 6,
+       lv_name   TYPE string,
+       lv_phone  TYPE string,
+       lv_age    TYPE i,
+       lv_weight TYPE f, " length not allowed
+       lv_worth  TYPE p DECIMALS 3, " length 1-16 only
+       lv_ssid   TYPE n.
+
+************************************************************************
+**Assigning values
+
+lv_cid    = 'ABC123'.
+lv_name   = 'MOHAMMED ASHHAD AHMED'.
+lv_phone  = '+91 986 654 5852'.
+lv_age    = '24'.
+lv_weight = '80.5896'.
+lv_worth  = '1.2345678987654321'.
+lv_ssid    = '123456'.
+
+
+************************************************************************
+**Formated weight and worth
+
+
+DATA :  lv_weight_formated TYPE string,
+        lv_worth_formated  TYPE string.
+
+lv_weight_formated = |{ lv_weight EXPONENT = 0 DECIMALS = 3 } Kg|.
+lv_worth_formated = |# { lv_worth CURRENCY = 'INR' }|.
+
+************************************************************************
+**Print Heading
+
+WRITE 35 'Customer Info' COLOR 6 INVERSE ON.
+SKIP.
+
+************************************************************************
+**Print table
+
+WRITE : sy-uline(80),                                                       " Top border line
+        /1 sy-vline,      'CUSTOMER ID',
+        40 sy-vline,      42 lv_cid,                        80 sy-vline,    " Customer ID row
+        / sy-uline+0(80),                                                   " Separator line
+        / sy-vline,       2 'CUSTOMER NAME',
+        40 sy-vline,      42 lv_name,                       80 sy-vline,    " Customer Name row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'CUSTOMER PHONE',
+        40 sy-vline,      42 lv_phone,                      80 sy-vline,    " Customer Phone row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'CUSTOMER AGE',
+        40 sy-vline,      42 lv_age LEFT-JUSTIFIED,         80 sy-vline,    " Customer Age row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'CUSTOMER WEIGHT',
+        40 sy-vline,      lv_weight_formated ,
+        80 sy-vline,                                                        " Customer Weight row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'CUSTOMER WORTH',
+        40 sy-vline,      42 lv_worth_formated,             80 sy-vline,    " Customer Worth row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'CUSTOMER SSID',
+        40 sy-vline,      42 lv_ssid,                       80 sy-vline,    " Customer SSID row
+        / sy-uline(80).

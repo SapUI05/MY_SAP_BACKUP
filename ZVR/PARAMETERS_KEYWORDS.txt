@@ -1,0 +1,69 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Samsung
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 13th JULY 2025
+*&  END DATE    : 13th JULY 2025
+*&  PURPOSE     : Sample application using PARAMETERS KEYWORD'S
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT zvr_parameters_keywords NO STANDARD PAGE HEADING.
+
+************************************************************************
+**Sample Selection screen using parameters keywords
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE text-001.
+
+SELECTION-SCREEN SKIP.
+*block with airline details
+SELECTION-SCREEN BEGIN OF BLOCK fdt WITH FRAME TITLE text-fdt.
+PARAMETERS :  p_air  TYPE c      LENGTH 10,
+              p_aid  TYPE c      LENGTH 5,
+              p_from TYPE c      LENGTH 25  DEFAULT     'Hyderabad',
+              p_to   TYPE c      LENGTH 25  OBLIGATORY,
+              p_pur  TYPE string LOWER CASE,
+              p_dis  TYPE c      LENGTH 10  NO-DISPLAY.
+SELECTION-SCREEN END OF BLOCK fdt.
+
+***block with food details
+SELECTION-SCREEN BEGIN OF BLOCK title_block WITH FRAME TITLE text-add NO INTERVALS.
+PARAMETERS : p_tea    AS CHECKBOX,
+             p_snacks AS CHECKBOX,
+             p_water  AS CHECKBOX.
+SELECTION-SCREEN END OF BLOCK title_block.
+
+*block with payment details
+SELECTION-SCREEN BEGIN OF BLOCK pmt WITH FRAME TITLE text-pmt NO INTERVALS.
+PARAMETERS : p_upi  RADIOBUTTON GROUP gl,
+             p_net  RADIOBUTTON GROUP gl,
+             p_cash RADIOBUTTON GROUP gl.
+SELECTION-SCREEN END OF BLOCK pmt .
+
+*block with personal and  baggage details
+SELECTION-SCREEN BEGIN OF BLOCK mis WITH FRAME TITLE text-mis NO INTERVALS.
+PARAMETERS: p_bkg    TYPE c LENGTH 100 VISIBLE LENGTH 15,
+            p_ticket TYPE c LENGTH 10 MEMORY ID sys_123,
+            p_state  AS LISTBOX VISIBLE LENGTH 25,
+            p_pan    TYPE c LENGTH 10,
+            p_adhr   TYPE n LENGTH 10,
+            p_ppp    TYPE c LENGTH 10 MATCHCODE OBJECT debia. "Elementry Search Help
+SELECTION-SCREEN END OF BLOCK mis .
+
+SELECTION-SCREEN END OF BLOCK b1.
+
+AT SELECTION-SCREEN OUTPUT.
+  "Code related to dropdown list
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_pan.
+  "Code related to f4 help(local search help)
+
+AT SELECTION-SCREEN ON HELP-REQUEST FOR p_adhr.
+  "code related to f1 help(documentation)

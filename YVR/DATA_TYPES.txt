@@ -1,0 +1,101 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : ASHHAD
+*&  CLIENT      : TANGENT
+*&  DEPT        : SD
+*&  MANAGER     : AHMED
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 12TH JULY 2025
+*&  END DATE    : 12TH JULY 2025
+*&  PURPOSE     : EXPERIMENT AND LEARN DATA TYPES
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_data_types NO STANDARD PAGE HEADING.
+
+************************************************************************
+**  Integer
+WRITE 'Integers'.
+WRITE sy-uline.
+SKIP.
+
+** Declaration
+
+DATA : lv_int1    TYPE i,
+
+************************************************************************
+**Length has no effect in combination with i but no error oly warning
+       lv_int2(5) TYPE i,
+
+************************************************************************
+**LENGTH IS ONLY VALID FOR C, N X OR P
+**below code will throw error
+*       lv_int3    TYPE i LENGTH 5,
+
+       lv_int4    TYPE i VALUE 8,
+       lv_int5    TYPE i VALUE 2,
+
+************************************************************************
+**Length has no effect in combination with i but no error oly warning
+       lv_int6(3) TYPE i VALUE 1.
+
+WRITE /: lv_int1,
+         lv_int2,
+************************
+**variable commented out
+*         lv_int3,
+         lv_int4,
+         lv_int5,
+         lv_int6.
+
+
+************************************************************************
+** Floats
+SKIP.
+WRITE : sy-uline,
+        'Float',
+        sy-uline.
+SKIP.
+
+**********************************************************************
+** Accuracy test
+
+DATA: lv_f1 TYPE f VALUE '10.0',
+      lv_f2 TYPE f VALUE '3.0',
+      lv_f3 TYPE f.
+
+lv_f3 = lv_f1 / lv_f2.
+WRITE: / '10 / 3 =', lv_f3.
+** The output will be 3.3333333333333335E+00, which is a good approximation but not exact.
+
+SKIP.
+WRITE : sy-uline+0(80),
+        / sy-vline,
+        35 'Float',
+        80 sy-vline,
+        / sy-uline(80).
+SKIP.
+
+DATA lv_float_l TYPE f VALUE '1.23456789'.
+
+WRITE /:  'Original',
+          lv_float_l,
+          'DECIMALS 0',
+          lv_float_l DECIMALS 0,
+          'NO-ZERO',
+          lv_float_l NO-ZERO,
+          'CURRENCY ''USD''',
+          lv_float_l CURRENCY 'USD',
+          'CURRENCY ''JYP''',
+          lv_float_l CURRENCY 'JPY',
+          'CURRENCY ''USD'' ROUND 2',
+          lv_float_l CURRENCY 'USD' ROUND 2,
+          'DECIMALS 5 ROUND -1',
+          lv_float_l DECIMALS 5 ROUND -1,
+          'DECIMALS -5',
+          lv_float_l DECIMALS -5.

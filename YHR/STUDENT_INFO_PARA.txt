@@ -1,0 +1,67 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : TCS
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 13TH JULY 2025
+*&  END DATE    : 13TH JULY 2025
+*&  PURPOSE     : To display student info using parameters
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yhr_student_info_para.
+
+
+************************************************************************
+************************************************************************
+**Format Data
+DATA :  p_wght_formated TYPE string,
+        p_fee_formated  TYPE string.
+
+**Selection Screen
+**Get Parameters
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE text-001.
+PARAMETERS : p_sid   TYPE c   LENGTH 60,
+             p_name  TYPE c   LENGTH 60,
+             p_phone TYPE c   LENGTH 60,
+             p_age   TYPE c   LENGTH 60,
+             p_wght  TYPE c   LENGTH 60,
+             p_fee   TYPE c   LENGTH 60,
+             p_ssid  TYPE c   LENGTH 60.
+SELECTION-SCREEN END OF BLOCK b1.
+
+
+p_wght_formated = |{ p_wght  } Kg|.
+p_fee_formated = |# { p_fee }|.
+
+************************************************************************
+**Print table
+WRITE : sy-uline(80),                                                       " Top border line
+        /1 sy-vline,      'STUDENT ID',
+        40 sy-vline,      42 p_sid,                        80 sy-vline,    " STUDENT ID row
+        / sy-uline+0(80),                                                   " Separator line
+        / sy-vline,       2 'STUDENT NAME',
+        40 sy-vline,      42 p_name,                       80 sy-vline,    " STUDENT Name row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT PHONE',
+        40 sy-vline,      42 p_phone,                      80 sy-vline,    " STUDENT Phone row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT AGE',
+        40 sy-vline,      42 p_age,                        80 sy-vline,    " STUDENT Age row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT WEIGHT',
+        40 sy-vline,      p_wght_formated ,
+        80 sy-vline,                                                        " STUDENT Weight row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT WORTH',
+        40 sy-vline,      42 p_fee_formated,               80 sy-vline,     " STUDENT FEE row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT SSID',
+        40 sy-vline,      42 p_ssid,                       80 sy-vline,    " STUDENT SSID row
+        / sy-uline(80).

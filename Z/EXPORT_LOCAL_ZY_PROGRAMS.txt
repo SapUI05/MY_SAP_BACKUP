@@ -1,0 +1,128 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Qio
+*&  DEPT        : Basis
+*&  MANAGER     : A
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 15TH JULY 2025
+*&  END DATE    : 15TH JULY 2025
+*&  PURPOSE     : EXPORT LOCAL ZY PROGRAMS
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT z_export_local_zy_programs.
+
+TABLES: trdir, tadir.
+
+DATA: lt_programs  TYPE STANDARD TABLE OF trdir,
+      lt_src       TYPE STANDARD TABLE OF string,
+      lv_progname  TYPE progname,
+      lv_path      TYPE string,
+      lv_fullpath  TYPE string,
+      lv_len       TYPE i,
+      lv_last_char TYPE c LENGTH 1.
+
+DATA: lv_folder TYPE string.
+skip.
+lv_folder = '\\vmware-host\Shared Folders\VMWARE_SHARE\MY_SAP_BACKUP'.
+
+START-OF-SELECTION.
+
+  " Validate folder input
+  IF lv_folder IS INITIAL.
+    MESSAGE 'Please enter a folder path (e.g. C:\Downloads\)' TYPE 'E'.
+  ENDIF.
+
+  TYPES: ty_char1 TYPE c LENGTH 1.
+
+  DATA: lt_chars TYPE STANDARD TABLE OF ty_char1 WITH EMPTY KEY,
+        lv_idx   TYPE sy-tabix.
+
+  lv_path = lv_folder.
+
+  " Split into individual characters
+  SPLIT lv_path AT '' INTO TABLE lt_chars.
+
+  " Get number of characters
+  DESCRIBE TABLE lt_chars LINES lv_idx.
+
+  IF lv_idx > 0.
+    READ TABLE lt_chars INTO lv_last_char INDEX lv_idx.
+  ENDIF.
+
+  " Append backslash if missing
+  IF lv_last_char <> '\'.
+    CONCATENATE lv_path '\' INTO lv_path.
+  ENDIF.
+
+  " Select only Z/Y programs in $TMP (local objects)
+  SELECT a~name
+    INTO TABLE lt_programs
+    FROM trdir AS a
+    INNER JOIN tadir AS b
+    ON a~name = b~obj_name
+    WHERE ( a~name LIKE 'Z%' OR a~name LIKE 'Y%' )
+      AND b~pgmid = 'R3TR'
+      AND b~object = 'PROG'
+      AND b~devclass = '$TMP'
+      AND b~author = sy-uname.
+
+  IF lt_programs IS INITIAL.
+    WRITE: / 'No local Z/Y programs found in $TMP.'.
+    EXIT.
+  ENDIF.
+
+  LOOP AT lt_programs INTO DATA(ls_program).
+
+    CLEAR: lt_src, lv_fullpath.
+    lv_progname = ls_program-name.
+
+    " Read source code
+    READ REPORT lv_progname INTO lt_src.
+
+    IF sy-subrc = 0 AND lt_src IS NOT INITIAL.
+
+      " Extract folder prefix and rest of program name
+      DATA(lv_prefix) = lv_progname.
+      DATA(lv_rest)   = lv_progname.
+
+      SPLIT lv_progname AT '_' INTO lv_prefix lv_rest.
+
+      " Construct subfolder path
+      DATA(lv_subfolder) = lv_path && lv_prefix && '\'.
+      DATA(lv_rc) = 0.
+
+      " Create subfolder (if not exists)
+      CALL METHOD cl_gui_frontend_services=>directory_create
+        EXPORTING
+          directory = lv_subfolder
+        CHANGING
+          rc        = lv_rc
+        EXCEPTIONS
+          OTHERS    = 1.
+
+      " Construct full file path
+      CONCATENATE lv_subfolder lv_rest '.txt' INTO lv_fullpath.
+
+      " Download file
+      CALL METHOD cl_gui_frontend_services=>gui_download
+        EXPORTING
+          filename = lv_fullpath
+          filetype = 'ASC'
+        CHANGING
+          data_tab = lt_src
+        EXCEPTIONS
+          OTHERS   = 1.
+
+      WRITE: / 'Exported:', lv_progname, '#', lv_fullpath.
+
+    ELSE.
+      WRITE: / 'Failed to read:', lv_progname.
+    ENDIF.
+
+  ENDLOOP.

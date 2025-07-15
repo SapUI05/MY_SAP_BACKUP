@@ -1,0 +1,177 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Garboo
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 14TH JULY 2025
+*&  END DATE    : 14TH JULY 2025
+*&  PURPOSE     :
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+**********************************************************************
+**Report Config
+REPORT yhr_garboo_employee_info NO STANDARD PAGE HEADING.
+**********************************************************************
+**Employee Type Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK etp WITH FRAME TITLE text-ept.
+PARAMETERS p_etyp AS LISTBOX LENGTH 20 VISIBLE LENGTH 20 DEFAULT 'Regular'.
+SELECTION-SCREEN END OF BLOCK etp.
+**********************************************************************
+**General Details Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK gen WITH FRAME TITLE text-gen.
+PARAMETERS : p_enum   TYPE n              LENGTH 20 DEFAULT '27' VISIBLE LENGTH 20,
+             p_en_nme TYPE string VISIBLE LENGTH 20 DEFAULT 'Momammed Kabir',
+             p_ar_nme TYPE string VISIBLE LENGTH 20 DEFAULT '#### ####',
+             p_em_pos TYPE string VISIBLE LENGTH 20 DEFAULT 'Engineer',
+             p_em_pow TYPE string VISIBLE LENGTH 20 DEFAULT 'Head Office'.
+SELECTION-SCREEN END OF BLOCK gen.
+**********************************************************************
+**Employee Type Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK per WITH FRAME TITLE text-per.
+PARAMETERS : p_em_dob TYPE d      VISIBLE LENGTH 20 DEFAULT '19720102',
+             p_emland AS LISTBOX  VISIBLE LENGTH 20 DEFAULT 'Sudanese' LENGTH 20,
+             p_em_mob TYPE string VISIBLE LENGTH 20 DEFAULT '+966 508 789 123',
+             p_em_eml TYPE string VISIBLE LENGTH 20 DEFAULT 'admin@sap.com',
+             p_em_bld AS LISTBOX  VISIBLE LENGTH 20 DEFAULT 'B+' LENGTH 20.
+SELECTION-SCREEN END OF BLOCK per.
+**********************************************************************
+**Socal Security Details
+SELECTION-SCREEN BEGIN OF BLOCK ssi WITH FRAME TITLE text-ssi.
+PARAMETERS : p_id_typ AS LISTBOX VISIBLE LENGTH 20 LENGTH 20 DEFAULT 'Aquma Card',
+             p_id_num TYPE n         LENGTH 20 DEFAULT '21478967' VISIBLE LENGTH 20,
+             p_idexh  TYPE d VISIBLE LENGTH 20 DEFAULT '14461220'.
+SELECTION-SCREEN END OF BLOCK ssi.
+**********************************************************************
+**Salary Details
+SELECTION-SCREEN BEGIN OF BLOCK sal WITH FRAME TITLE text-sal.
+PARAMETERS : p_basic  TYPE i VISIBLE LENGTH 20 DEFAULT 123,
+             p_fdalo  TYPE i VISIBLE LENGTH 20 DEFAULT 123,
+             p_wrkalo TYPE i VISIBLE LENGTH 20 DEFAULT 123,
+             p_trnalo TYPE i VISIBLE LENGTH 20 DEFAULT 123,
+             p_tsal   TYPE i VISIBLE LENGTH 20 DEFAULT 123.
+SELECTION-SCREEN END OF BLOCK sal.
+**********************************************************************
+**Table Layout Settings
+SELECTION-SCREEN BEGIN OF BLOCK tb_param WITH FRAME TITLE text-tbl. "Table param
+PARAMETERS: p_lpos   TYPE i DEFAULT 20,
+            p_tbl_wt TYPE i DEFAULT 80.
+SELECTION-SCREEN END OF BLOCK tb_param.
+SELECTION-SCREEN SKIP.
+**********************************************************************
+**Selection Screen Output
+AT SELECTION-SCREEN OUTPUT.   "Code to implement selection sreen Output
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_id_typ.
+
+AT SELECTION-SCREEN ON HELP-REQUEST FOR p_id_typ.
+
+START-OF-SELECTION.
+
+**********************************************************************
+**Filling Data based on input
+  DATA lv_idexg  TYPE d  VALUE '12222025'.
+**********************************************************************
+**Table Config Variables Declaration
+  DATA : lv_hfl_wdh    TYPE i,
+         lv_first_ln   TYPE i,
+         lv_middle_ln  TYPE i,
+         lv_last_ln    TYPE i,
+         lv_head_txt   TYPE i,
+         lv_first_txt  TYPE i,
+         lv_second_txt TYPE i.
+**********************************************************************
+**Table Size Variable
+  lv_hfl_wdh  = p_tbl_wt / 2.
+**********************************************************************
+**Table Line Variable
+  lv_first_ln  = p_lpos.
+  lv_middle_ln = p_lpos  + lv_hfl_wdh.
+  lv_last_ln   = p_lpos  + p_tbl_wt - 1.
+**********************************************************************
+**Table Text Variable
+  lv_head_txt   = lv_first_ln   + 8.
+  lv_first_txt  = lv_first_ln   + 2.
+  lv_second_txt = lv_middle_ln  + 2.
+************************************************************************
+**Print General Details
+  SKIP 2.
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          text-gen,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Employee Type',    AT lv_second_txt p_etyp,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Employee Number',  AT lv_second_txt p_enum,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Name(English)',    AT lv_second_txt p_en_nme,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Name(Arabic)',     AT lv_second_txt p_ar_nme,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Position',         AT lv_second_txt p_em_pos,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Place of Work',    AT lv_second_txt p_em_pow,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+************************************************************************
+**Print Personal Details
+  SKIP 2.
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          text-per,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Date of Birth',    AT lv_second_txt p_em_dob,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Nationality',      AT lv_second_txt p_emland,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Mobile',           AT lv_second_txt p_em_mob,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'E-mail',           AT lv_second_txt p_em_eml,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Blood Group',      AT lv_second_txt p_em_bld,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+************************************************************************
+**Print SSID Details
+  SKIP 2.
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          text-ssi,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'ID Type',                    AT lv_second_txt p_id_typ,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'ID Number',                  AT lv_second_txt p_id_num,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'ID Expiry Date(Hijri)',      AT lv_second_txt p_idexh,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'ID Expiry Date(Gregorian)',  AT lv_second_txt lv_idexg,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+
+************************************************************************
+**Print Salary Details
+  SKIP 2.
+  WRITE :
+    AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt          text-sal,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Basic Salary',         AT lv_second_txt p_id_typ,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Food Allowance',       AT lv_second_txt p_fdalo LEFT-JUSTIFIED,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Work Allowance',       AT lv_second_txt p_wrkalo LEFT-JUSTIFIED,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Transfer Allowance',   AT lv_second_txt p_trnalo LEFT-JUSTIFIED,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt),   AT /lv_first_txt        'Total Salary',         AT lv_second_txt p_tsal LEFT-JUSTIFIED,
+    AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
+    AT /lv_first_ln sy-uline(p_tbl_wt).
+
+SKIP 4.

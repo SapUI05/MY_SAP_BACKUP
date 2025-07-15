@@ -1,0 +1,41 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Sony
+*&  DEPT        : SD
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 14TH JULY 2025
+*&  END DATE    : 14TH JULY 2025
+*&  PURPOSE     : To demonstrate SELECT-OPTIONS declaration
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_sel_opt_basic NO STANDARD PAGE HEADING.
+
+**********************************************************************
+**TABLE Declaration
+TABLES : vbak, likp, vbrk.
+**********************************************************************
+**Declaration of Data
+DATA lv_cust TYPE c LENGTH 15.
+**********************************************************************
+**Parameters Initilized
+PARAMETERS p_cust TYPE c LENGTH 15 NO-DISPLAY.
+**********************************************************************
+**Select-Option Using Data
+SELECT-OPTIONS s_lvcust FOR lv_cust.
+**********************************************************************
+**Select-Option Using Parameters
+SELECT-OPTIONS s_prcust FOR p_cust.
+**********************************************************************
+**Select-Option Using Variable without intervals
+SELECT-OPTIONS s_lcuni FOR lv_cust NO INTERVALS.
+**********************************************************************
+**Select-Option Using Variable without intervals
+SELECT-OPTIONS s_lcune FOR lv_cust NO-EXTENSION.

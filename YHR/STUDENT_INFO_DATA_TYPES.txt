@@ -1,0 +1,71 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : SAP
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 13TH JULY 2025
+*&  END DATE    : 13TH JULY 2025
+*&  PURPOSE     : To display student info using data types
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+
+REPORT yhr_student_info_data_types NO STANDARD PAGE HEADING.
+
+************************************************************************
+**Declaration
+DATA : lv_sid    TYPE c LENGTH 6,
+       lv_name   TYPE string,
+       lv_phone  TYPE string,
+       lv_age    TYPE i,
+       lv_weight TYPE f, " length not allowed
+       lv_fee    TYPE p DECIMALS 3, " length 1-16 only
+       lv_ssid   TYPE n.
+
+**Printing local variables
+DATA :  lv_weight_formated TYPE string,
+        lv_fee_formated    TYPE string.
+
+************************************************************************
+**Assigning values
+lv_sid    = 'ABC123'.
+lv_name   = 'MOHAMMED ASHHAD AHMED'.
+lv_phone  = '+91 986 654 5852'.
+lv_age    = '24'.
+lv_weight = '80.5896'.
+lv_fee  = '1.2345678987654321'.
+lv_ssid    = '123456'.
+lv_weight_formated = '123.45'.
+lv_fee_formated = '1000.789'.
+
+***display
+WRITE : sy-uline(80),                                                       " Top border line
+        / sy-vline,      2 'STUDENT ID',
+        40 sy-vline,      42 lv_sid,                        80 sy-vline,    " STUDENT ID row
+        / sy-uline+0(80),                                                   " Separator line
+        / sy-vline,       2 'STUDENT NAME',
+        40 sy-vline,      42 lv_name,                       80 sy-vline,    " STUDENT Name row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT PHONE',
+        40 sy-vline,      42 lv_phone,                      80 sy-vline,    " STUDENT Phone row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT AGE',
+        40 sy-vline,      42 lv_age LEFT-JUSTIFIED,         80 sy-vline,    " STUDENT Age row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT WEIGHT',
+        40 sy-vline,      lv_weight_formated , 'Kgs',
+        80 sy-vline,                                                        " STUDENT Weight row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT FEE',
+        40 sy-vline,      42 'Rs',45 lv_fee_formated,             80 sy-vline,    " STUDENT Worth row
+        / sy-uline(80),                                                     " Separator line
+        / sy-vline,       2 'STUDENT SSID',
+        40 sy-vline,      42 lv_ssid,                       80 sy-vline,    " STUDENT SSID row
+        / sy-uline(80).
