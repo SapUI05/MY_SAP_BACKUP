@@ -28,7 +28,7 @@ DATA: lt_programs  TYPE STANDARD TABLE OF trdir,
       lv_last_char TYPE c LENGTH 1.
 
 DATA: lv_folder TYPE string.
-skip.
+
 lv_folder = '\\vmware-host\Shared Folders\VMWARE_SHARE\MY_SAP_BACKUP'.
 
 START-OF-SELECTION.

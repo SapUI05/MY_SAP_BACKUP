@@ -1,0 +1,116 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Dell
+*&  DEPT        : SD
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 14th JULY 2025
+*&  END DATE    : 14th JULY 2025
+*&  PURPOSE     : Application to showcase boilerplate
+*&                for using user Command and ModIf ID
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_user_cmd_modif_id_sel_opt NO STANDARD PAGE HEADING.
+************************************************************************
+**Table INIT
+TABLES : vbak, likp, vbrk.
+************************************************************************
+**Main Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK main_selector WITH FRAME TITLE text-001.
+PARAMETERS: p_sales RADIOBUTTON GROUP sel DEFAULT 'X' USER-COMMAND ucomm,
+            p_deliv RADIOBUTTON GROUP sel,
+            p_invo  RADIOBUTTON GROUP sel.
+SELECTION-SCREEN END OF BLOCK main_selector.
+
+************************************************************************
+**Sales Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK sales_blk WITH FRAME TITLE text-smn.
+SELECT-OPTIONS: p_vdoc  FOR vbak-vbeln     MODIF ID smn,
+                p_vbnam FOR vbak-ernam     MODIF ID smn,
+                p_vbdat FOR vbak-erdat     MODIF ID smn,
+                p_vbzet FOR vbak-erzet     MODIF ID smn,
+                p_vbcat FOR vbak-vbtyp     MODIF ID smn,
+                p_vbtyp FOR vbak-auart     MODIF ID smn,
+                p_vb_sp FOR vbak-kunnr     MODIF ID smn,
+                p_vb_bp FOR vbak-bukrs_vf  MODIF ID smn,
+                p_vbnet FOR vbak-netwr     MODIF ID smn NO INTERVALS,
+                p_vbcur FOR vbak-waerk     MODIF ID smn NO-EXTENSION.
+SELECTION-SCREEN END OF BLOCK sales_blk.
+
+************************************************************************
+**Delivery Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK logist_blk WITH FRAME TITLE text-lmn.
+SELECT-OPTIONS: p_lidoc FOR likp-vbeln MODIF ID lmn,
+                p_linam FOR likp-ernam MODIF ID lmn OBLIGATORY DEFAULT 'NoOne' TO 'SomeOne' LOWER CASE,
+                p_lidat FOR likp-erdat MODIF ID lmn LOWER CASE,
+                p_lizet FOR likp-erzet MODIF ID lmn,
+                p_li_sp FOR likp-kunag MODIF ID lmn,
+                p_lityp FOR likp-lfart MODIF ID lmn,
+                p_li_sh FOR likp-kunnr MODIF ID lmn,
+                p_linet FOR likp-netwr MODIF ID lmn,
+                p_licur FOR likp-waerk MODIF ID lmn NO-EXTENSION NO INTERVALS.
+SELECTION-SCREEN END OF BLOCK logist_blk.
+
+************************************************************************
+**Billing Selection Plane
+SELECTION-SCREEN BEGIN OF BLOCK bill_blk WITH FRAME TITLE text-imn.
+SELECT-OPTIONS: p_bdoc FOR vbrk-vbeln MODIF ID bmn,
+                p_bnam FOR vbrk-ernam MODIF ID bmn,
+                p_bdat FOR vbrk-erdat MODIF ID bmn,
+                p_bzet FOR vbrk-erzet MODIF ID bmn,
+                p_b_sp FOR vbrk-kunag MODIF ID bmn,
+                p_btyp FOR vbrk-fkart MODIF ID bmn,
+                p_bpyr FOR vbrk-kunrg MODIF ID bmn,
+                p_bnet FOR vbrk-netwr MODIF ID bmn,
+                p_bng  FOR vbrk-waerk MODIF ID bmn.
+SELECTION-SCREEN END OF BLOCK bill_blk.
+
+AT SELECTION-SCREEN OUTPUT.
+
+**********************************************************************
+  DATA: lv_active_group TYPE screen-group1,
+        lv_show         TYPE i.
+
+* Determine the active group based on which radio button is selected
+  CASE 'X'.
+    WHEN p_sales.
+      lv_active_group = 'SMN'.
+    WHEN p_deliv.
+      lv_active_group = 'LMN'.
+    WHEN p_invo.
+      lv_active_group = 'BMN'.
+  ENDCASE.
+
+
+  LOOP AT SCREEN.
+
+** Now apply the hide/show logic for the explicitly controlled groups
+    IF screen-group1 = '' OR screen-group1 IS INITIAL.
+      CONTINUE.
+    ENDIF.
+
+    lv_show = 0.
+    IF screen-group1 = lv_active_group.
+      lv_show = 1.
+    ENDIF.
+
+    screen-input     = lv_show.
+    screen-invisible = 1 - lv_show.
+    screen-active    = lv_show.
+
+    MODIFY SCREEN.
+  ENDLOOP.
+**********************************************************************
+**To ensure a round-trip to the server to refresh the screen
+**whenever a radio button is clicked.
+  IF sy-ucomm IS INITIAL. " Only for initial display
+    SET CURSOR FIELD p_sales. " Set default focus if needed
+  ENDIF.
+**********************************************************************
+**********************************************************************
