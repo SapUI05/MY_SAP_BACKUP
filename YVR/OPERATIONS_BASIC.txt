@@ -1,0 +1,155 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : NOKIA
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 16TH JULY 2025
+*&  END DATE    : 16TH JULY 2025
+*&  PURPOSE     : Application to demonstrate the use of OPERATIONS
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_operations_basic NO STANDARD PAGE HEADING.
+
+SELECTION-SCREEN BEGIN OF BLOCK tb_param WITH FRAME. "Table param
+PARAMETERS: p_lpos   TYPE i DEFAULT 10 NO-DISPLAY,
+            p_tbl_wt TYPE i DEFAULT 50 NO-DISPLAY.
+SELECTION-SCREEN END OF BLOCK tb_param.
+SELECTION-SCREEN SKIP.
+
+SELECTION-SCREEN BEGIN OF BLOCK config WITH FRAME TITLE text-001.
+PARAMETERS : p_for  TYPE i DEFAULT 10,
+             p_till TYPE i DEFAULT 5,
+             p_vari TYPE i DEFAULT 5.
+SELECTION-SCREEN END   OF BLOCK config.
+**********************************************************************
+**General Config
+DATA : lv_title     TYPE string,
+       lv_for       TYPE string,
+       lv_for_ini   TYPE i,
+       lv_times     TYPE i,
+       lv_times_str TYPE string,
+       lv_mul_res   TYPE i,
+       lv_mul_txt   TYPE string,
+       lv_col_pos   TYPE i.
+**********************************************************************
+**Table Config
+DATA : lv_hfl_wdh    TYPE i,
+       lv_first_ln   TYPE i,
+       lv_middle_ln  TYPE i,
+       lv_last_ln    TYPE i,
+       lv_head_txt   TYPE i,
+       lv_first_txt  TYPE i,
+       lv_second_txt TYPE i.
+
+lv_hfl_wdh  = p_tbl_wt / 2.
+
+lv_first_ln  = p_lpos.
+lv_middle_ln = p_lpos  + lv_hfl_wdh.
+lv_last_ln   = p_lpos  + p_tbl_wt - 1.
+
+
+lv_head_txt   = lv_first_ln   + 8.
+lv_first_txt  = lv_first_ln   + 2.
+lv_second_txt = lv_middle_ln  + 2.
+
+lv_for_ini = p_for.
+lv_times = 0.
+
+START-OF-SELECTION.
+
+************************************************************************
+**Print Train Details
+  SKIP.
+  p_for = p_for - p_vari.
+
+  DO 3 TIMES.
+    p_for = p_for + p_vari.
+
+    lv_for = p_for.
+    CONCATENATE ' ' text-ttl lv_for ' ' INTO lv_title SEPARATED BY ' '.
+
+    lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+    lv_head_txt   = lv_col_pos   + 8.
+    WRITE :
+      AT lv_col_pos  sy-uline(p_tbl_wt),   AT lv_head_txt lv_title.
+*      AT lv_first_ln  sy-uline(p_tbl_wt),   AT lv_head_txt lv_title.
+  ENDDO.
+
+  WRITE / ''.
+  DO 3 TIMES.
+    lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+
+*    lv_col_pos = lv_last_ln * ( sy-index - 1 ) * '1.2' .
+    WRITE :      AT lv_col_pos  sy-vline.
+    lv_col_pos = lv_last_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+    WRITE :      AT lv_col_pos  sy-vline.
+  ENDDO.
+
+  p_for = lv_for_ini .
+  p_for = p_for - p_vari.
+
+  DO p_till TIMES.
+
+    WRITE / ''.
+    DO 3 TIMES.
+      lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+      WRITE : AT lv_col_pos sy-uline(p_tbl_wt).
+    ENDDO.
+
+    WRITE / ''.
+
+      p_for = lv_for_ini.
+      p_for = p_for - p_vari.
+
+      lv_for = p_for.
+
+      lv_times = lv_times + 1.
+      lv_times_str = lv_times.
+
+
+      DO 3 TIMES.
+
+
+        lv_mul_res = lv_times * p_for .
+        CONCATENATE lv_for 'X' lv_times_str '=' INTO lv_mul_txt SEPARATED BY ' '.
+
+        lv_col_pos = lv_first_txt + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+        WRITE : AT lv_col_pos lv_mul_txt.
+
+        lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+        WRITE : AT lv_col_pos sy-vline.
+
+        lv_col_pos = lv_second_txt + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+        WRITE : AT lv_col_pos lv_mul_res.
+
+        lv_col_pos = lv_last_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+        WRITE : AT lv_col_pos sy-vline.
+
+
+        p_for = p_for + p_vari.
+        lv_for = p_for.
+
+      ENDDO.
+
+    DO 3 TIMES.
+      lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+      WRITE : AT lv_col_pos  sy-vline.
+      lv_col_pos = lv_last_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+      WRITE : AT lv_col_pos sy-vline.
+    ENDDO.
+
+  ENDDO.
+
+  WRITE / ''.
+  DO 3 TIMES.
+    lv_col_pos = lv_first_ln + ( p_tbl_wt * ( sy-index - 1 ) * '1.2' ) .
+    WRITE : AT lv_col_pos sy-uline(p_tbl_wt).
+  ENDDO.

@@ -1,0 +1,247 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : SAP
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 17TH JULY 2025
+*&  END DATE    : 17TH JULY 2025
+*&  PURPOSE     :
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yhr_operations_basic NO STANDARD PAGE HEADING.
+**********************************************************************
+**Data Init
+**Reverse String Result
+DATA : lv_rev_res  TYPE string,
+**String Length
+       lv_strlen   TYPE string,
+**Shifted String
+       lv_sft_mod  TYPE string,
+**Condensed String - No arguments
+       lv_cds_def  TYPE string,
+**Condensed String - No GAPS
+       lv_cds_gap  TYPE string,
+**Translate String - UpperCase
+       lv_trans_up TYPE string,
+**Translate String - LowerCase
+       lv_trans_lo TYPE string,
+**Replace String - default
+       lv_repl_1   TYPE string,
+**Replace String - all
+       lv_repl_all TYPE string,
+**Translate String - LowerCase
+       lv_trans_l  TYPE string,
+**Split String - results
+       lv_spres1   TYPE string,
+       lv_spres2   TYPE string,
+       lv_spres3   TYPE string,
+**Join String - results
+       lv_jnres    TYPE string,
+**Translate String - LowerCase
+       lv_cds_ga   TYPE string.
+**********************************************************************
+**Selection screen Init
+SELECTION-SCREEN BEGIN OF block sel WITH FRAME TITLE text-sel.
+  PARAMETERS: p_stri RADIOBUTTON GROUP sel DEFAULT 'X' USER-COMMAND ucom,
+              p_comp RADIOBUTTON GROUP sel,
+              p_logi RADIOBUTTON GROUP sel.
+SELECTION-SCREEN END   OF block sel.
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-inp.
+
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(20) text-rev.
+
+**input string to reverse
+PARAMETERS :p_rev   TYPE string DEFAULT 'ABC123'.
+
+**String Length Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(20) text-len.
+
+**input string to get length
+PARAMETERS :p_slen  TYPE string DEFAULT 'BASICs'.
+
+**Shift Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-sft.
+
+**input string to shift text
+PARAMETERS :p_sft  TYPE string DEFAULT 'JavaScript',
+**input string to shift text n times
+            p_sftm TYPE i DEFAULT 4.
+
+***Condense Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-cnd.
+
+**input string to condense text
+PARAMETERS :p_cond  TYPE string DEFAULT '  Welcome To SAP.                  hello world.                   '.
+
+***Translate Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-trn.
+
+**input string to translate text
+PARAMETERS :p_tran  TYPE string DEFAULT 'Airtel Xstream' LOWER CASE.
+
+***Replace Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-rep.
+
+**input string to translate text
+PARAMETERS :p_repl  TYPE string DEFAULT 'Hello User',
+**input string to replace text what
+            p_rewth TYPE string DEFAULT 'l',
+**input string to replace text with
+            p_rewit TYPE string DEFAULT 'p'.
+
+**Split Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-spt.
+**input string to Get split text
+PARAMETERS :p_sptxt TYPE string DEFAULT 'method searches a string for a specified character, and replaces it with a new string where the specified character',
+
+**input string to Get split text at
+            p_spat  TYPE string DEFAULT ' '.
+
+**Shift Block
+SELECTION-SCREEN SKIP.
+SELECTION-SCREEN COMMENT /1(50) text-jon.
+
+**input string to Get condcatenate text
+PARAMETERS :p_jn1  TYPE string DEFAULT 'Welcome',
+            p_jn2  TYPE string DEFAULT 'To',
+            p_jn3  TYPE string DEFAULT 'SAP As ABAP Developer',
+**input join strings to use as delimnetor
+            p_jnde TYPE string DEFAULT ' '.
+SELECTION-SCREEN END   OF BLOCK inp.
+
+**********************************************************************
+**Operations
+*REVERSE String
+lv_rev_res = reverse( p_rev ).
+
+*STRLEN
+lv_strlen = strlen( p_slen ).
+
+*SHIFT
+lv_sft_mod = p_sft.
+DO p_sftm TIMES.
+  SHIFT lv_sft_mod.
+ENDDO.
+
+*CONDENSE
+**duplicating text
+lv_cds_def = p_cond.
+lv_cds_gap = p_cond.
+**Default Condense
+CONDENSE lv_cds_def.
+**Condense NO-GAPS
+CONDENSE lv_cds_gap NO-GAPS.
+
+*TRANSLATE_LOWER
+**duplicating text
+lv_trans_up = p_tran.
+lv_trans_lo = p_tran.
+** Translate UpperCase
+TRANSLATE lv_trans_up TO UPPER CASE .
+** Translate lowerCase
+TRANSLATE lv_trans_lo TO LOWER CASE.
+
+*REPLACE
+**duplicating text
+lv_repl_1   = p_repl.
+lv_repl_all = p_repl.
+*Replacing - default config
+REPLACE                    p_rewth IN lv_repl_1   WITH p_rewit.
+*Replacing - All
+REPLACE ALL OCCURRENCES OF p_rewth IN lv_repl_all WITH p_rewit.
+
+*SPLIT
+IF p_spat IS INITIAL.
+  SPLIT p_sptxt AT ' ' INTO lv_spres1 lv_spres2 lv_spres3.
+ELSE.
+  SPLIT p_sptxt AT p_spat INTO lv_spres1 lv_spres2 lv_spres3.
+ENDIF.
+
+*CONCATENATE
+CONCATENATE p_jn1  p_jn2 p_jn3 INTO lv_jnres SEPARATED BY p_jnde.
+
+*COMPARE
+
+*ARITHMETIC
+
+
+**********************************************************************
+**Printing
+SKIP.
+*REVERSE
+WRITE :  AT /5 'Reverse Text',  AT /5 sy-uline(80),
+         AT /5 'Orignal Text',  40 p_rev,
+         AT /5 'Reversed Text', 40 lv_rev_res,
+         AT /5 sy-uline(80).
+SKIP 2.
+*STRLEN
+WRITE : AT /5 'String Length', AT /5 sy-uline(80),
+        AT /5 'Input Text',    40 p_slen,
+        AT /5 'String Length', 40 lv_strlen,
+        AT /5 sy-uline(80).
+SKIP 2.
+*SHIFT
+WRITE : AT /5 'Shift Text',   AT /5 sy-uline(80),
+        AT /5 'Input Text',   40 p_sft,
+        AT /5 'Shifted Text', 40 lv_sft_mod,
+        AT /5 sy-uline(80).
+SKIP 2.
+*CONDENSE
+lv_cds_def = p_cond.
+lv_cds_gap = p_cond.
+WRITE : AT /5 'Condense Text',   AT /5 sy-uline(80),
+        AT /5 'Input Text',   40 p_sft,
+        AT /5 'Condensed Text', 40 lv_sft_mod,
+        AT /5 sy-uline(80).
+SKIP 2.
+*TRANSLATE_UPPER
+WRITE : AT /5 'Translate Text',   AT /5 sy-uline(80),
+        AT /5 'Input Text',   40 p_tran,
+        AT /5 'Text in UPPERCASE', 40 lv_trans_up,
+        AT /5 'Text in LOWERCASE', 40 lv_trans_lo,
+        AT /5 sy-uline(80).
+SKIP 2.
+*REPLACE
+WRITE : AT /5 'Replace String',       AT /5 sy-uline(80),
+        AT /5 'Replace in Text',      40 p_repl,
+        AT /5 'Replace What',         40 p_rewth,
+        AT /5 'Replace With',         40 p_rewit,
+        AT /5 'Replaced Text(1)',     40 lv_repl_1,
+        AT /5 'Replaced Text(All)',   40 lv_repl_all,
+        AT /5 sy-uline(80).
+SKIP 2.
+*SPLIT
+WRITE : AT /5 'Split Text',         AT /5 sy-uline(80),
+        AT /5 'Text to Split',      40 p_sptxt,
+        AT /5 'Split at Text',      40 |'{ p_spat }'| ,
+        AT /5 'Splited Text 1',     40 lv_spres1,
+        AT /5 'Splited Text 2',     40 lv_spres2,
+        AT /5 'Splited Text rest',  40 lv_spres3,
+        AT /5 sy-uline(80).
+SKIP 2.
+*CONCATENATE
+WRITE : AT /5 'CONCATENATE Text',   AT /5 sy-uline(80),
+        AT /5 'Input Text 1',       40 p_jn1,
+        AT /5 'Input Text 2',       40 p_jn2,
+        AT /5 'Input Text 3',       40 p_jn3,
+        AT /5 'Deliminator',        40 p_jnde,
+        AT /5 'Concatenated Text',  40 lv_jnres,
+        AT /5 sy-uline(80).
+SKIP 2.
+*COMPARE
+*
+*ARITHMETIC

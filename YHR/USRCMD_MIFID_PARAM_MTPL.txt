@@ -1,0 +1,247 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : ITC
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  START DATE  : 16TH JULY 2025
+*&  END DATE    : 16TH JULY 2025
+*&  PURPOSE     : HR: Application to implement/activate inputs  based multiple radio
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yhr_usrcmd_mifid_param_mtpl.
+
+**********************************************************************
+* TYPE-POOLS AND DATA DECLARATIONS
+**********************************************************************
+* Structure to hold visibility rules for each MODIF ID
+TYPES: BEGIN OF ty_screen_rule,
+         group1    TYPE screen-group1,    " MODIF ID of the screen element/group (max 3 chars)
+         input     TYPE screen-input,     " '0' (inactive) or '1' (active)
+         invisible TYPE screen-invisible, " '0' (visible) or '1' (invisible)
+         active    TYPE screen-active,    " '0' (inactive/greyed out) or '1' (active)
+       END OF ty_screen_rule.
+
+* Table type for storing all screen rules
+TYPES: tt_screen_rules TYPE HASHED TABLE OF ty_screen_rule WITH UNIQUE KEY group1.
+
+* Global variable to store the rules (populated in AT SELECTION-SCREEN OUTPUT)
+DATA: gt_screen_rules TYPE tt_screen_rules.
+
+* Constants for MODIF IDs (improves readability and prevents typos) - MAX 3 CHARS!
+CONSTANTS:
+  lc_main_rg_id TYPE screen-group1 VALUE 'MGR', " Main Group Radio
+  lc_blk_a_id   TYPE screen-group1 VALUE 'BLA', " Block A
+  lc_blk_b_id   TYPE screen-group1 VALUE 'BLB', " Block B
+  lc_fld_a1_id  TYPE screen-group1 VALUE 'FA1', " Fields A-1
+  lc_fld_a2_id  TYPE screen-group1 VALUE 'FA2', " Fields A-2
+  lc_fld_b1_id  TYPE screen-group1 VALUE 'FB1', " Fields B-1
+  lc_fld_b2_id  TYPE screen-group1 VALUE 'FB2'. " Fields B-2
+
+**********************************************************************
+* SELECTION SCREEN DEFINITION
+**********************************************************************
+* Text elements for titles (F4 on TEXT-xxx to create in SE38)
+*TEXT-M01: 'Main Selection Screen'.
+*TEXT-S01: 'Sub Selection Screen A'.
+*TEXT-S02: 'Sub Selection Screen B'.
+*TEXT-IA1: 'Input Screen A-1 Fields'.
+*TEXT-IA2: 'Input Screen A-2 Fields'.
+*TEXT-IB1: 'Input Screen B-1 Fields'.
+*TEXT-IB2: 'Input Screen B-2 Fields'.
+*TEXT-COM: 'Common Fields'.
+
+* Main Selection Radio Buttons
+SELECTION-SCREEN BEGIN OF BLOCK main_sel WITH FRAME TITLE text-m01.
+PARAMETERS: p_maina RADIOBUTTON GROUP mgr DEFAULT 'X' USER-COMMAND ucomm, " p_main_a -> p_maina
+            p_mainb RADIOBUTTON GROUP mgr.                              " p_main_b -> p_mainb
+SELECTION-SCREEN END OF BLOCK main_sel.
+
+*--------------------------------------------------------------------*
+* Sub Selection Screen A (Visible when p_maina is selected)
+*--------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK sub_sela WITH FRAME TITLE text-s01.
+PARAMETERS: p_suba1 RADIOBUTTON GROUP srga MODIF ID bla DEFAULT 'X' USER-COMMAND subcm, " p_sub_a1 -> p_suba1
+            p_suba2 RADIOBUTTON GROUP srga MODIF ID bla.            " p_sub_a2 -> p_suba2
+SELECTION-SCREEN END OF BLOCK sub_sela.
+
+* Input Screen A-1 Fields (Visible when p_suba1 is selected)
+SELECTION-SCREEN BEGIN OF BLOCK inp_a1 WITH FRAME TITLE text-ia1.
+PARAMETERS:
+  p_fa1_2  TYPE vbak-vkorg     MODIF ID fa1, " Sales Organization
+  p_fa1_3  TYPE vbak-vtweg     MODIF ID fa1, " Distribution Channel
+  p_fa1_4  TYPE vbak-spart     MODIF ID fa1, " Division
+  p_fa1_5  TYPE vbak-audat     MODIF ID fa1, " Order Date
+  p_fa1_6  TYPE vbep-edatu     MODIF ID fa1, " Requested Delivery Date
+  p_fa1_7  TYPE vbap-matnr     MODIF ID fa1, " Material Code
+  p_fa1_8  TYPE vbap-zmeng     MODIF ID fa1, " Quantity
+  p_fa1_10 TYPE konv-kschl     MODIF ID fa1. " Pricing Condition
+SELECTION-SCREEN END OF BLOCK inp_a1.
+
+* Input Screen A-2 Fields (Visible when p_suba2 is selected)
+SELECTION-SCREEN BEGIN OF BLOCK inp_a2 WITH FRAME TITLE text-ia2.
+PARAMETERS:
+  p_fa2_1 TYPE vbak-vbeln      MODIF ID fa2, " Sales Order Number
+  p_fa2_3 TYPE vbak-audat      MODIF ID fa2, " Order Date From
+  p_fa2_4 TYPE vbak-audat      MODIF ID fa2, " Order Date To
+  p_fa2_5 TYPE vbuk-lfstk      MODIF ID fa2, " Delivery Status
+  p_fa2_6 TYPE vbak-vkorg      MODIF ID fa2. " Sales Organization
+SELECTION-SCREEN END OF BLOCK inp_a2.
+
+*--------------------------------------------------------------------*
+* Sub Selection Screen B (Visible when p_mainb is selected)
+*--------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK sub_selb WITH FRAME TITLE text-s02.
+PARAMETERS: p_subb1 RADIOBUTTON GROUP srgb MODIF ID blb DEFAULT 'X' USER-COMMAND subcm, " p_sub_b1 -> p_subb1
+            p_subb2 RADIOBUTTON GROUP srgb MODIF ID blb.            " p_sub_b2 -> p_subb2
+SELECTION-SCREEN END OF BLOCK sub_selb.
+
+* Input Screen B-1 Fields (Visible when p_subb1 is selected)
+SELECTION-SCREEN BEGIN OF BLOCK inp_b1 WITH FRAME TITLE text-ib1.
+PARAMETERS:
+  p_fb1_1 TYPE likp-vbeln      MODIF ID fb1, " Delivery Document Number
+  p_fb1_2 TYPE likp-lfdat      MODIF ID fb1, " Delivery Date
+  p_fb1_3 TYPE likp-vstel      MODIF ID fb1, " Shipping Point
+  p_fb1_4 TYPE lips-lgnum      MODIF ID fb1, " Warehouse Number
+  p_fb1_5 TYPE lips-lfimg      MODIF ID fb1, " Delivery Quantity
+  p_fb1_7 TYPE vekp-exidv      MODIF ID fb1. " Packaging Details
+SELECTION-SCREEN END OF BLOCK inp_b1.
+
+* Input Screen B-2 Fields (Visible when p_subb2 is selected)
+SELECTION-SCREEN BEGIN OF BLOCK inp_b2 WITH FRAME TITLE text-ib2.
+PARAMETERS:
+  p_fb2_1 TYPE likp-vbeln      MODIF ID fb2, " Delivery Document Number
+  p_fb2_3 TYPE likp-lfdat      MODIF ID fb2, " Shipping Date From
+  p_fb2_4 TYPE likp-lfdat      MODIF ID fb2, " Shipping Date To
+  p_fb2_5 TYPE likp-vstel      MODIF ID fb2, " Shipping Point
+  p_fb2_7 TYPE vbuk-lfstk      MODIF ID fb2. " Delivery Status
+SELECTION-SCREEN END OF BLOCK inp_b2.
+
+*--------------------------------------------------------------------*
+* Common Fields (Always visible)
+*--------------------------------------------------------------------*
+SELECTION-SCREEN BEGIN OF BLOCK comm_fld WITH FRAME TITLE text-com.
+PARAMETERS: p_comfld TYPE kna1-kunnr. " Customer Number
+SELECTION-SCREEN END OF BLOCK comm_fld.
+
+**********************************************************************
+* AT SELECTION-SCREEN OUTPUT EVENT - Dynamic Screen Logic
+**********************************************************************
+AT SELECTION-SCREEN OUTPUT.
+
+  DATA: ls_rule TYPE ty_screen_rule.
+
+** --- Step 1: Initialize all controlled groups to hidden/inactive ---
+** This is a robust starting point: assume everything is off unless explicitly turned on.
+  CLEAR gt_screen_rules.
+  REFRESH gt_screen_rules.
+
+  ls_rule-input = '0'.
+  ls_rule-invisible = '1'.
+  ls_rule-active = '0'.
+
+  " Add all MODIF IDs that will be dynamically controlled
+  ls_rule-group1 = lc_blk_a_id.  INSERT ls_rule INTO TABLE gt_screen_rules.
+  ls_rule-group1 = lc_blk_b_id.  INSERT ls_rule INTO TABLE gt_screen_rules.
+  ls_rule-group1 = lc_fld_a1_id. INSERT ls_rule INTO TABLE gt_screen_rules.
+  ls_rule-group1 = lc_fld_a2_id. INSERT ls_rule INTO TABLE gt_screen_rules.
+  ls_rule-group1 = lc_fld_b1_id. INSERT ls_rule INTO TABLE gt_screen_rules.
+  ls_rule-group1 = lc_fld_b2_id. INSERT ls_rule INTO TABLE gt_screen_rules.
+
+** --- Step 2: Determine which groups should be active based on radio button selections ---
+
+** Main Selection Logic: Determine which main block (A or B) should be active
+  IF p_maina = 'X'.
+    " Make BLOCK_A active
+    READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_blk_a_id.
+    IF sy-subrc EQ 0.
+      ls_rule-input = '1'.
+      ls_rule-invisible = '0'.
+      ls_rule-active = '1'.
+      MODIFY TABLE gt_screen_rules FROM ls_rule.
+    ENDIF.
+
+** Sub-Selection Logic for BLOCK_A: Determine which input fields under A should be active
+    IF p_suba1 = 'X'.
+      " Make FLDS_A1 active
+      READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_fld_a1_id.
+      IF sy-subrc EQ 0.
+        ls_rule-input = '1'.
+        ls_rule-invisible = '0'.
+        ls_rule-active = '1'.
+        MODIFY TABLE gt_screen_rules FROM ls_rule.
+      ENDIF.
+    ELSEIF p_suba2 = 'X'.
+      " Make FLDS_A2 active
+      READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_fld_a2_id.
+      IF sy-subrc EQ 0.
+        ls_rule-input = '1'.
+        ls_rule-invisible = '0'.
+        ls_rule-active = '1'.
+        MODIFY TABLE gt_screen_rules FROM ls_rule.
+      ENDIF.
+    ENDIF.
+
+  ELSEIF p_mainb = 'X'.
+    " Make BLOCK_B active
+    READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_blk_b_id.
+    IF sy-subrc EQ 0.
+      ls_rule-input = '1'.
+      ls_rule-invisible = '0'.
+      ls_rule-active = '1'.
+      MODIFY TABLE gt_screen_rules FROM ls_rule.
+    ENDIF.
+
+** Sub-Selection Logic for BLOCK_B: Determine which input fields under B should be active
+    IF p_subb1 = 'X'.
+      " Make FLDS_B1 active
+      READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_fld_b1_id.
+      IF sy-subrc EQ 0.
+        ls_rule-input = '1'.
+        ls_rule-invisible = '0'.
+        ls_rule-active = '1'.
+        MODIFY TABLE gt_screen_rules FROM ls_rule.
+      ENDIF.
+    ELSEIF p_subb2 = 'X'.
+      " Make FLDS_B2 active
+      READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = lc_fld_b2_id.
+      IF sy-subrc EQ 0.
+        ls_rule-input = '1'.
+        ls_rule-invisible = '0'.
+        ls_rule-active = '1'.
+        MODIFY TABLE gt_screen_rules FROM ls_rule.
+      ENDIF.
+    ENDIF.
+
+  ENDIF. " End of Main Selection Logic
+
+** --- Step 3: Apply the generated rules to the screen ---
+  LOOP AT SCREEN.
+** Skip elements that have no MODIF ID or belong to the main radio button group's ID
+** (These are assumed to be always visible and active)
+    IF screen-group1 IS INITIAL OR screen-group1 = lc_main_rg_id.
+      CONTINUE.
+    ENDIF.
+
+** Look up the rule for the current screen element's group
+    READ TABLE gt_screen_rules INTO ls_rule WITH KEY group1 = screen-group1.
+    IF sy-subrc EQ 0. " If this screen element's group is in our rules table
+      screen-input     = ls_rule-input.
+      screen-invisible = ls_rule-invisible.
+      screen-active    = ls_rule-active.
+      MODIFY SCREEN.
+    ENDIF.
+  ENDLOOP.
+
+** --- Ensure a round-trip to the server to refresh the screen ---
+** This is crucial for dynamic changes on selection screens.
+** USER-COMMAND 'ucomm' on p_maina triggers this.
+  IF sy-ucomm IS INITIAL. " Only for initial display when no user command has been issued yet
+    SET CURSOR FIELD p_maina. " Set default focus to the first main radio button
+  ENDIF.

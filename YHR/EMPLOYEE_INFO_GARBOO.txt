@@ -74,7 +74,6 @@ AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_id_typ.
 AT SELECTION-SCREEN ON HELP-REQUEST FOR p_id_typ.
 
 START-OF-SELECTION.
-
 **********************************************************************
 **Filling Data based on input
   DATA lv_idexg  TYPE d  VALUE '12222025'.
@@ -174,4 +173,4 @@ START-OF-SELECTION.
     AT lv_first_ln  sy-vline,             AT lv_last_ln sy-vline,
     AT /lv_first_ln sy-uline(p_tbl_wt).
 
-SKIP 4.
+  SKIP 4.
