@@ -1,0 +1,136 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Lenovo
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 18TH JULY 2025
+*&  END DATE    : 18TH JULY 2025
+*&  PURPOSE     : An Application to use loops to print parterns
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yhr_loop_parttern NO STANDARD PAGE HEADING.
+
+SELECTION-SCREEN BEGIN  OF     BLOCK sel WITH FRAME TITLE text-0mn.
+PARAMETERS :     p_iter TYPE i OBLIGATORY DEFAULT 5.  "No of Ittretions to perform
+SELECTION-SCREEN SKIP.
+PARAMETERS :     p_smpl AS     CHECKBOX,                  "Simple right agl triangle Parttern
+                 p_insp AS     CHECKBOX,                  "Vertically flipped right agl triangle Parttern
+                 p_rtar AS     CHECKBOX,                  "Right arrow triangle Parttern
+                 p_resm AS     CHECKBOX,                  "Rright agl triangle Parttern with starting spaces
+                 p_rear AS     CHECKBOX DEFAULT 'X' .     "Simple right agl triangle Parttern with starting spaces
+SELECTION-SCREEN END    OF     BLOCK sel.
+
+DATA : lv_str       TYPE n,
+       lv_start_pos TYPE i VALUE 15,
+       lv_col_pos   TYPE i,
+       lv_space     TYPE c VALUE '#',
+       lv_res       TYPE string.
+
+IF ( p_smpl =  'X' ).
+  SKIP 2 .
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO sy-index TIMES.
+      lv_str = sy-index .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE / lv_res.
+  ENDDO.
+ENDIF.
+
+
+IF ( p_insp =  'X' ).
+  SKIP 2 .
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO p_iter - sy-index + 1 TIMES.
+      lv_str = sy-index .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE / lv_res.
+  ENDDO.
+ENDIF.
+
+IF ( p_rtar =  'X' ).
+  SKIP 2 .
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO sy-index TIMES.
+      lv_str = sy-index .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE / lv_res.
+  ENDDO.
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO p_iter - sy-index + 1 TIMES.
+      lv_str = sy-index .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE / lv_res.
+  ENDDO.
+ENDIF.
+
+
+IF ( p_resm =  'X' ).
+  SKIP 2 .
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO p_iter - sy-index TIMES.
+      CONCATENATE lv_res  '#' INTO lv_res .
+    ENDDO.
+    DO sy-index TIMES.
+      lv_str = sy-index .
+      CONDENSE lv_str NO-GAPS.
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE / lv_res.
+  ENDDO.
+ENDIF.
+
+
+
+IF ( p_rear =  'X' ).
+  SKIP .
+  WRITE /: sy-uline, 'Rhombus', sy-uline.
+  SKIP .
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO 0 TIMES.
+      CONCATENATE lv_res  lv_space INTO lv_res .
+*      CONCATENATE lv_res  '#' INTO lv_res .
+    ENDDO.
+    DO sy-index TIMES.
+      lv_str = sy-index .
+      lv_str = 1 .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    lv_col_pos =  p_iter - sy-index + lv_start_pos .
+    WRITE : AT /lv_col_pos   lv_res .
+    write sy-vline.
+  ENDDO.
+  DO p_iter TIMES.
+    lv_res = '' .
+    DO sy-index TIMES.
+      CONCATENATE lv_res  lv_space INTO lv_res .
+*      CONCATENATE lv_res  '#' INTO lv_res .
+    ENDDO.
+*    DO p_iter - sy-index TIMES.
+    DO 0 TIMES.
+      lv_str = sy-index .
+      lv_str = 1 .
+      CONCATENATE lv_res lv_str INTO lv_res .
+    ENDDO.
+    WRITE : AT /lv_start_pos lv_res .
+    write sy-vline.
+  ENDDO.
+ENDIF.
