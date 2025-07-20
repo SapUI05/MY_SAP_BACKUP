@@ -1,0 +1,43 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : ITC
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 20TH JULY 2025
+*&  END DATE    : 20TH JULY 2025
+*&  PURPOSE     : Aplication to test various messages
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yhr_messages_basic.
+
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-0mn.
+PARAMETERS : p_info  RADIOBUTTON GROUP gr1,
+             p_abort RADIOBUTTON GROUP gr1,
+             p_suces RADIOBUTTON GROUP gr1,
+             p_warng RADIOBUTTON GROUP gr1,
+             p_error RADIOBUTTON GROUP gr1,
+             p_exit  RADIOBUTTON GROUP gr1.
+SELECTION-SCREEN END   OF BLOCK inp.
+
+CASE 'X'.
+  WHEN p_info .
+    MESSAGE i001(zsd_msg_cl).
+  WHEN p_abort.
+    MESSAGE a001(zsd_msg_cl).
+  WHEN p_suces.
+    MESSAGE s001(zsd_msg_cl).
+  WHEN p_warng.
+    MESSAGE w001(zsd_msg_cl).
+  WHEN p_error.
+    MESSAGE e001(zsd_msg_cl).
+  WHEN p_exit .
+    MESSAGE x001(zsd_msg_cl).
+ENDCASE.

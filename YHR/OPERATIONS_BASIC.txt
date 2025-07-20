@@ -57,15 +57,17 @@ SELECTION-SCREEN COMMENT /1(20) text-rev.
 PARAMETERS :p_rev   TYPE string DEFAULT 'ABC123'.
 
 **String Length Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(20) text-len.
+SELECTION-SCREEN SKIP.
 
 **input string to get length
 PARAMETERS :p_slen  TYPE string DEFAULT 'BASICs'.
 
 **Shift Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-sft.
+SELECTION-SCREEN SKIP.
 
 **input string to shift text
 PARAMETERS :p_sft  TYPE string DEFAULT 'JavaScript',
@@ -73,22 +75,25 @@ PARAMETERS :p_sft  TYPE string DEFAULT 'JavaScript',
             p_sftm TYPE i DEFAULT 4.
 
 ***Condense Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-cnd.
+SELECTION-SCREEN SKIP.
 
 **input string to condense text
 PARAMETERS :p_cond  TYPE string DEFAULT '  Welcome To SAP.                  hello world.                   '.
 
 ***Translate Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-trn.
+SELECTION-SCREEN SKIP.
 
 **input string to translate text
 PARAMETERS :p_tran  TYPE string DEFAULT 'Airtel Xstream' LOWER CASE.
 
 ***Replace Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-rep.
+SELECTION-SCREEN SKIP.
 
 **input string to translate text
 PARAMETERS :p_repl  TYPE string DEFAULT 'Hello User',
@@ -98,8 +103,9 @@ PARAMETERS :p_repl  TYPE string DEFAULT 'Hello User',
             p_rewit TYPE string DEFAULT 'p'.
 
 **Split Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-spt.
+SELECTION-SCREEN SKIP.
 **input string to Get split text
 PARAMETERS :p_sptxt TYPE string DEFAULT 'method searches a string for a specified character, and replaces it with a new string where the specified character',
 
@@ -107,8 +113,9 @@ PARAMETERS :p_sptxt TYPE string DEFAULT 'method searches a string for a specifie
             p_spat  TYPE string DEFAULT ' '.
 
 **Shift Block
-SELECTION-SCREEN SKIP.
+SELECTION-SCREEN SKIP 2.
 SELECTION-SCREEN COMMENT /1(50) text-jon.
+SELECTION-SCREEN SKIP.
 
 **input string to Get condcatenate text
 PARAMETERS :p_jn1  TYPE string DEFAULT 'Welcome',
@@ -167,8 +174,11 @@ ELSE.
 ENDIF.
 
 *CONCATENATE
+IF p_jnde IS INITIAL.
+CONCATENATE p_jn1  p_jn2 p_jn3 INTO lv_jnres SEPARATED BY ' '.
+else.
 CONCATENATE p_jn1  p_jn2 p_jn3 INTO lv_jnres SEPARATED BY p_jnde.
-
+endif.
 *COMPARE
 
 *ARITHMETIC

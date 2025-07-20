@@ -20,25 +20,25 @@
 REPORT yhr_operations_basic_tabbed NO STANDARD PAGE HEADING.
 
 **Data Init
-DATA : lv_rev_res  TYPE string,
-       lv_strlen   TYPE string,
-       lv_sft_mod  TYPE string,
-       lv_cds_def  TYPE string,
-       lv_cds_gap  TYPE string,
-       lv_trans_up TYPE string,
-       lv_trans_lo TYPE string,
-       lv_repl_1   TYPE string,
-       lv_repl_all TYPE string,
-       lv_spres1   TYPE string,
-       lv_spres2   TYPE string,
-       lv_spres3   TYPE string,
-       lv_jnres    TYPE string,
-       lv_math_res TYPE i,
-       lv_log_res  TYPE abap_bool,
-       lv_comp_res TYPE abap_bool,
-       lv_show     TYPE i,
-       lv_main_act TYPE screen-group1, " Active MODIF ID for main blocks
-       lv_sub_act  TYPE screen-group1. " Active MODIF ID for sub-blocks/fields
+DATA : lv_rev_res   TYPE string,
+       lv_strlen    TYPE string,
+       lv_sft_mod   TYPE string,
+       lv_cds_def   TYPE string,
+       lv_cds_gap   TYPE string,
+       lv_trans_up  TYPE string,
+       lv_trans_lo  TYPE string,
+       lv_repl_1    TYPE string,
+       lv_repl_all  TYPE string,
+       lv_spres1    TYPE string,
+       lv_spres2    TYPE string,
+       lv_spres3    TYPE string,
+       lv_jnres     TYPE string,
+       lv_math_res  TYPE i,
+       lv_log_res   TYPE abap_bool,
+       lv_comp_res  TYPE abap_bool,
+       lv_show      TYPE i,
+       lv_mn_active TYPE screen-group1, " Active MODIF ID for main blocks
+       lv_sb_active TYPE screen-group1. " Active MODIF ID for sub-blocks/fields
 
 **********************************************************************
 **Main Selector
@@ -91,28 +91,81 @@ PARAMETERS : p_mtadd RADIOBUTTON GROUP maop MODIF ID nsl DEFAULT 'X'  USER-COMMA
              p_mtexp RADIOBUTTON GROUP maop MODIF ID nsl.                                 "Math - Exponent
 SELECTION-SCREEN END   OF BLOCK maop.
 
+**********************************************************************
+**Input String to get length
+SELECTION-SCREEN BEGIN OF BLOCK stln WITH FRAME TITLE text-len.
+PARAMETERS : p_sinlen TYPE string MODIF ID s01 DEFAULT 'ASHHAD'.                          "String Input to get Length
+SELECTION-SCREEN END   OF BLOCK stln.
+
+**********************************************************************
+**Input String to reverse
+SELECTION-SCREEN BEGIN OF BLOCK stre WITH FRAME TITLE text-rev.
+PARAMETERS : p_sinrev TYPE string MODIF ID s02 LOWER CASE DEFAULT 'USA'.                  "String Input to get REverse
+SELECTION-SCREEN END   OF BLOCK stre.
+
+**********************************************************************
+**Input String to Shift
+SELECTION-SCREEN BEGIN OF BLOCK stft WITH FRAME TITLE text-rev.
+PARAMETERS : p_sinsft TYPE string MODIF ID s03 DEFAULT 'JAVASCRIPT',                      "String Input to get Shift text
+             p_sincnt TYPE i      MODIF ID s03 DEFAULT 4.                                 "String Input to get Shift count
+SELECTION-SCREEN END   OF BLOCK stft.
+
+**********************************************************************
+**Input String to reverse
+SELECTION-SCREEN BEGIN OF BLOCK stco WITH FRAME TITLE text-rev.
+PARAMETERS : p_sinre7 TYPE string MODIF ID s02 LOWER CASE
+DEFAULT 'Some random      spaces          text. Hello          World   '.                  "String Input to get Condense
+SELECTION-SCREEN END   OF BLOCK stco.
+
+**********************************************************************
+**Input String to reverse
+SELECTION-SCREEN BEGIN OF BLOCK stre1 WITH FRAME TITLE text-rev.
+PARAMETERS : p_sinre TYPE string MODIF ID s02 LOWER CASE DEFAULT 'USA'.                   "String Input to get REverse
+SELECTION-SCREEN END   OF BLOCK stre1.
+
 
 
 AT SELECTION-SCREEN OUTPUT.
 
+**Get Main Active Option
   CASE 'X'.
-    WHEN p_strn.   lv_main_act = 'SSL'.
-    WHEN p_logi.   lv_main_act = 'LSL'.
-    WHEN p_comp.   lv_main_act = 'CSL'.
-    WHEN p_math.   lv_main_act = 'NSL'.
-    WHEN OTHERS.   lv_main_act = 'OTH'.
+    WHEN p_strn.   lv_mn_active = 'SSL'.
+    WHEN p_logi.   lv_mn_active = 'LSL'.
+    WHEN p_comp.   lv_mn_active = 'CSL'.
+    WHEN p_math.   lv_mn_active = 'NSL'.
+    WHEN OTHERS.   lv_mn_active = 'OTH'.
   ENDCASE.
 
+
+**Get Sub Active Option
+  IF ( lv_mn_active = 'SSL' ).
+    CASE 'X'.
+      WHEN p_stlen.   lv_sb_active = 'S01'.
+      WHEN p_strev.   lv_sb_active = 'S02'.
+      WHEN p_stsft.   lv_sb_active = 'S03'.
+      WHEN p_stcds.   lv_sb_active = 'S04'.
+      WHEN p_sttra.   lv_sb_active = 'S05'.
+      WHEN p_strep.   lv_sb_active = 'S06'.
+      WHEN p_stspt.   lv_sb_active = 'S07'.
+      WHEN p_stfnd.   lv_sb_active = 'S08'.
+      WHEN p_stsst.   lv_sb_active = 'S09'.
+      WHEN p_stjon.   lv_sb_active = 'S0A'.
+      WHEN OTHERS.    lv_sb_active = 'OTH'.
+    ENDCASE.
+  ENDIF.
+
+**Hide unchecked sections
   LOOP AT SCREEN.
-
-
     IF screen-group1 = '' OR screen-group1 IS INITIAL.
       CONTINUE.
     ENDIF.
 
-    lv_show = 01.
+    lv_show = 0.
 
-    IF screen-group1 = lv_main_act OR screen-group1 = 'MSL' .
+    IF
+      screen-group1 = lv_mn_active OR
+       screen-group1 = lv_sb_active OR
+      screen-group1 = 'MSL' .
       lv_show = 1.
     ENDIF.
 
@@ -123,3 +176,16 @@ AT SELECTION-SCREEN OUTPUT.
     MODIFY SCREEN.
 
   ENDLOOP.
+
+
+START-OF-SELECTION.
+
+  IF lv_sb_active = 'S01' .
+    lv_strlen = strlen( p_sinlen ).
+    WRITE : 'Length of string "', p_sinlen, '" is ', lv_strlen .
+  ENDIF.
+
+  IF lv_sb_active = 'S02' .
+    lv_rev_res = reverse( p_sinrev ).
+    WRITE : 'Reverse of string "', p_sinrev, '" is ', lv_rev_res .
+  ENDIF.

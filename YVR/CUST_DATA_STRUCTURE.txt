@@ -1,0 +1,111 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : HP
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Distribution
+*&  START DATE  : 20TH JULY 2025
+*&  END DATE    : 20TH JULY 2025
+*&  PURPOSE     : Application to fetch and display customer data
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_cust_data_structure NO STANDARD PAGE HEADING LINE-SIZE 220.
+
+**Declaration
+DATA : BEGIN OF wa_kna1,
+         kunnr TYPE kna1-kunnr,
+         name1 TYPE kna1-name1,
+         telf1 TYPE kna1-telf1,
+         ort01 TYPE kna1-ort01,
+         regio TYPE kna1-regio,
+         stras TYPE kna1-stras,
+         pstlz TYPE kna1-pstlz,
+         land1 TYPE kna1-land1,
+         spras TYPE kna1-spras,
+         uwaer TYPE kna1-uwaer,
+         ktokd TYPE kna1-ktokd,
+       END OF wa_kna1,
+       it_kna1    LIKE TABLE OF wa_kna1,
+       lv_rec_cnt TYPE i.
+
+**Screen Design
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-0mn.
+SELECT-OPTIONS : s_kunnr FOR wa_kna1-kunnr,
+                 s_land1 FOR wa_kna1-land1 NO INTERVALS,
+                 s_ktokd FOR wa_kna1-ktokd NO-EXTENSION NO INTERVALS.
+SELECTION-SCREEN END   OF BLOCK inp.
+
+**fetch customer data
+SELECT  kunnr
+        name1
+        telf1
+        ort01
+        regio
+        stras
+        pstlz
+        land1
+        spras
+        uwaer
+        ktokd
+  FROM kna1 INTO
+  CORRESPONDING FIELDS OF
+  TABLE it_kna1
+  WHERE
+    kunnr IN s_kunnr AND
+    land1 IN s_land1 AND
+    ktokd IN s_ktokd.
+
+
+IF sy-subrc = 0.
+
+**Get No of records
+  DESCRIBE TABLE it_kna1 LINES lv_rec_cnt.
+
+
+  WRITE :/ lv_rec_cnt COLOR 5, text-001 COLOR 2 .
+
+  SKIP.
+  ULINE.
+
+**Column Headings
+  WRITE :   /1  sy-vline, 'Customer No.'    COLOR 6 INVERSE ON ,
+            15  sy-vline, 'Name'            COLOR 6 INVERSE ON ,
+            50  sy-vline, 'Telephone'       COLOR 6 INVERSE ON ,
+            67  sy-vline, 'City'            COLOR 6 INVERSE ON ,
+            100 sy-vline, 'State'           COLOR 6 INVERSE ON ,
+            120 sy-vline, 'Street & H.No'   COLOR 6 INVERSE ON ,
+            155 sy-vline, 'PinCode'         COLOR 6 INVERSE ON ,
+            165 sy-vline, 'Country'         COLOR 6 INVERSE ON ,
+            175 sy-vline, 'Language'        COLOR 6 INVERSE ON ,
+            185 sy-vline, 'Currency'        COLOR 6 INVERSE ON ,
+            200 sy-vline, 'Account Group'   COLOR 6 INVERSE ON .
+  ULINE.
+
+**Looping internal table data
+  LOOP AT it_kna1 INTO wa_kna1.
+**Writing Indivudal rows from workarea
+    WRITE :  /1  sy-vline, wa_kna1-kunnr UNDER  'Customer No.' ,
+             15  sy-vline, wa_kna1-name1 UNDER  'Name'         ,
+             50  sy-vline, wa_kna1-telf1 UNDER  'Telephone'    ,
+             67  sy-vline, wa_kna1-ort01 UNDER  'City'         ,
+             100 sy-vline, wa_kna1-regio UNDER  'State'        ,
+             120 sy-vline, wa_kna1-stras UNDER  'Street & H.No',
+             155 sy-vline, wa_kna1-pstlz UNDER  'PinCode'      ,
+             165 sy-vline, wa_kna1-land1 UNDER  'Country'      ,
+             175 sy-vline, wa_kna1-spras UNDER  'Language'     ,
+             185 sy-vline, wa_kna1-uwaer UNDER  'Currency'     ,
+             200 sy-vline, wa_kna1-ktokd UNDER  'Account Group'.
+*                 sy-uline.
+  ENDLOOP.
+  ULINE.
+ELSE.
+**Dispaying Error, if any
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
