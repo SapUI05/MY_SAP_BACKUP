@@ -1,0 +1,199 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : ABC
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 29TH JULY 2025
+*&  END DATE    : 29TH JULY 2025
+*&  PURPOSE     : Application to lookup manager name
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yhr_manager_lookup_loop NO STANDARD PAGE HEADING.
+
+
+********************************************************************************************************************************
+TYPES: BEGIN OF ty_emp,
+         empid    TYPE n LENGTH 4,
+         name     TYPE c LENGTH 15,
+         salary   TYPE p DECIMALS 2,
+         currency TYPE string,
+         manager  TYPE n LENGTH 4,
+       END OF ty_emp.
+
+FIELD-SYMBOLS : <fs_emp> TYPE ty_emp.
+
+DATA: it_emp TYPE TABLE OF ty_emp,
+      wa_res TYPE ty_emp.
+
+it_emp = VALUE #(
+  ( empid = '1001' name = 'Raheem' salary = '10000.00' currency = 'INR' manager = '1008' )
+  ( empid = '1002' name = 'Ram'    salary = '20000.00' currency = 'INR' manager = '1009' )
+  ( empid = '1003' name = 'Paul'   salary = '30000.00' currency = 'INR' manager = '1001' )
+  ( empid = '1004' name = 'John'   salary = '40000.00' currency = 'INR' manager = '1002' )
+  ( empid = '1005' name = 'Saleem' salary = '10000.00' currency = 'INR' manager = '1004' )
+  ( empid = '1006' name = 'Shawn'  salary = '20000.00' currency = 'INR' manager = '1001' )
+  ( empid = '1007' name = 'Bush'   salary = '30000.00' currency = 'INR' manager = '1009' )
+  ( empid = '1008' name = 'Obama'  salary = '40000.00' currency = 'INR' manager = '1010' )
+  ( empid = '1009' name = 'Pal'    salary = '10000.00' currency = 'INR' manager = '1010' )
+  ( empid = '1010' name = 'Sam'    salary = '20000.00' currency = 'INR' manager = '1011' )
+  ( empid = '1011' name = 'Spain'  salary = '30000.00' currency = 'INR' manager = '1001' )
+).
+
+
+WRITE : text-ecd ,
+        text-nam ,
+        text-sal ,
+        text-cur ,
+        text-mna .
+ULINE.
+LOOP AT it_emp ASSIGNING <fs_emp>.
+  WRITE :/ <fs_emp>-empid     UNDER text-ecd COLOR 1 ,
+           <fs_emp>-name      UNDER text-nam COLOR 2 ,
+           <fs_emp>-salary    UNDER text-sal COLOR 3 ,
+           <fs_emp>-currency  UNDER text-cur COLOR 4 ,
+           <fs_emp>-manager   UNDER text-mna COLOR 5 .
+ENDLOOP.
+
+
+ULINE.
+SKIP 2.
+
+WRITE : /1  text-nam COLOR 1 ,
+        20  text-mna COLOR 2 ,
+        40  text-hmn COLOR 3 .
+ULINE.
+
+LOOP AT it_emp INTO wa_res.
+  WRITE : / wa_res-name   UNDER text-nam COLOR 5 CENTERED.
+  READ TABLE it_emp INTO wa_res WITH KEY empid = wa_res-manager .
+  WRITE :  wa_res-name   UNDER text-mna COLOR 5 CENTERED.
+  READ TABLE it_emp INTO wa_res WITH KEY empid = wa_res-manager .
+  WRITE :  wa_res-name   UNDER text-hmn COLOR 5 CENTERED.
+ENDLOOP.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+**********************************************************************************************************************************
+**TYPES: BEGIN OF ty_emp,
+**         empid    TYPE n LENGTH 4,
+**         name     TYPE c LENGTH 15,
+**         salary   TYPE p DECIMALS 2,
+**         currency TYPE string,
+**         manager  TYPE n LENGTH 4,
+**       END OF ty_emp,
+**       BEGIN OF ty_res,
+**         name   TYPE c LENGTH 15,
+**         mname  TYPE c LENGTH 15,
+**         mmname TYPE c LENGTH 15,
+**       END OF ty_res.
+**
+**FIELD-SYMBOLS : <fs_emp> TYPE ty_emp,
+**                <fs_tmp> TYPE ty_emp,
+**                <fs_res> TYPE ty_res.
+**
+**DATA: it_emp TYPE TABLE OF ty_emp,
+**      wa_res TYPE ty_res,
+**      it_res TYPE TABLE OF ty_res.
+**
+**
+**it_emp = VALUE #(
+**  ( empid = '1001' name = 'Raheem' salary = '10000.00' currency = 'INR' manager = '1008' )
+**  ( empid = '1002' name = 'Ram'    salary = '20000.00' currency = 'INR' manager = '1009' )
+**  ( empid = '1003' name = 'Paul'   salary = '30000.00' currency = 'INR' manager = '1001' )
+**  ( empid = '1004' name = 'John'   salary = '40000.00' currency = 'INR' manager = '1002' )
+**  ( empid = '1005' name = 'Saleem' salary = '10000.00' currency = 'INR' manager = '1004' )
+**  ( empid = '1006' name = 'Shawn'  salary = '20000.00' currency = 'INR' manager = '1001' )
+**  ( empid = '1007' name = 'Bush'   salary = '30000.00' currency = 'INR' manager = '1009' )
+**  ( empid = '1008' name = 'Obama'  salary = '40000.00' currency = 'INR' manager = '1010' )
+**  ( empid = '1009' name = 'Pal'    salary = '10000.00' currency = 'INR' manager = '1010' )
+**  ( empid = '1010' name = 'Sam'    salary = '20000.00' currency = 'INR' manager = '1011' )
+**  ( empid = '1011' name = 'Spain'  salary = '30000.00' currency = 'INR' manager = '1001' )
+**).
+**
+**
+**WRITE : text-ecd ,
+**        text-nam ,
+**        text-sal ,
+**        text-cur ,
+**        text-mna .
+**uline.
+**LOOP AT it_emp ASSIGNING <fs_emp>.
+**WRITE :/ <fs_emp>-empid     under text-ecd color 1 ,
+**         <fs_emp>-name      under text-nam color 2 ,
+**         <fs_emp>-salary    under text-sal color 3 ,
+**         <fs_emp>-currency  under text-cur color 4 ,
+**         <fs_emp>-manager   under text-mna color 5 .
+**ENDLOOP.
+**
+**
+**uline.
+**skip 2.
+**
+**WRITE : / text-nam COLOR 1 ,
+**          text-mna COLOR 2 ,
+**          text-hmn COLOR 3 .
+**ULINE.
+**LOOP AT it_emp ASSIGNING <fs_emp>.
+**  CLEAR wa_res .
+**  wa_res-name = <fs_emp>-name.
+**  READ TABLE it_emp ASSIGNING <fs_tmp> WITH KEY empid = <fs_emp>-manager .
+**  wa_res-mname = <fs_tmp>-name.
+**  READ TABLE it_emp ASSIGNING <fs_tmp> WITH KEY empid = <fs_tmp>-manager .
+**  wa_res-mmname = <fs_tmp>-name.
+**  APPEND wa_res TO it_res .
+**  WRITE : / wa_res-name   UNDER text-nam COLOR 5 CENTERED,
+**            wa_res-mname  UNDER text-mna COLOR 6 CENTERED,
+**            wa_res-mmname UNDER text-hmn COLOR 7 CENTERED.
+**ENDLOOP.
+
+
+
+
+*CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+* EXPORTING
+*   I_CALLBACK_PROGRAM                = sy-cprog
+*  TABLES
+*    t_outtab                          = it_res
+* EXCEPTIONS
+*   PROGRAM_ERROR                     = 1
+*   OTHERS                            = 2
+*          .
+*IF sy-subrc <> 0.
+** Implement suitable error handling here
+*ENDIF.

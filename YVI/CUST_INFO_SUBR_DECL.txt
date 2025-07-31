@@ -1,0 +1,18 @@
+***DECLARATIONS OF TYPES STRUCTURE
+TYPES : BEGIN OF ty_kna1,
+          kunnr TYPE kna1-kunnr,
+          name1 TYPE kna1-name1,
+          sortl TYPE kna1-sortl,
+          telf1 TYPE kna1-telf1,
+          ort01 TYPE kna1-ort01,
+          regio TYPE kna1-regio,
+          land1 TYPE kna1-land1,
+          stras TYPE kna1-stras,
+          pstlz TYPE kna1-pstlz,
+          ktokd TYPE kna1-ktokd,
+        END OF ty_kna1.
+
+***DECLARATION OF WORK AREA AND INTERNAL TABLE
+DATA : wa_kna1 TYPE ty_kna1,
+       it_kna1 TYPE TABLE OF ty_kna1,
+       lv_rec  TYPE string.

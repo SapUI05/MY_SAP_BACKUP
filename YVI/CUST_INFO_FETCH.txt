@@ -1,0 +1,64 @@
+*----------------------------------------------------------------------*
+***INCLUDE YVI_CUST_INFO_FETCH.
+*----------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Form  FETCH_CUST_INFO
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+*      -->P_S_KUNNR  text
+*      -->P_S_LAND1  text
+*      -->P_IT_KNA1  text
+*      <--P_LV_REC  text
+*----------------------------------------------------------------------*
+FORM fetch_cust_info  TABLES   p_s_kunnr
+                               p_s_land1
+                               p_it_kna1
+                      USING    p_ktokd
+                      CHANGING p_lv_rec.
+  SELECT kunnr
+         name1
+         sortl
+         telf1
+         ort01
+         regio
+         land1
+         stras
+         pstlz
+         ktokd FROM  kna1
+               INTO  TABLE    p_it_kna1
+               WHERE kunnr IN p_s_kunnr
+               AND   land1 IN p_s_land1
+               AND   ktokd EQ p_ktokd.
+
+***check no. of records
+*  break sapuser.
+*  IF sy-subrc = 0.
+  IF p_it_kna1[] IS NOT INITIAL.
+    DESCRIBE TABLE p_it_kna1 LINES p_lv_rec.
+  ELSE.
+    MESSAGE e000(zsd_msg_cl).
+  ENDIF.
+ENDFORM.
+FORM display_cust_info .
+  DATA : lv_msg TYPE string.
+
+***build a message
+  CONCATENATE 'No. of records for given input are:' lv_rec INTO lv_msg SEPARATED BY ' '.
+  MESSAGE lv_msg TYPE 'I'.
+
+  LOOP AT it_kna1 INTO wa_kna1.
+    WRITE :/ wa_kna1-kunnr,
+             wa_kna1-name1,
+             wa_kna1-sortl,
+             wa_kna1-telf1,
+             wa_kna1-ort01,
+             wa_kna1-regio,
+             wa_kna1-land1,
+             wa_kna1-stras,
+             wa_kna1-pstlz,
+             wa_kna1-ktokd.
+    CLEAR wa_kna1.
+  ENDLOOP.
+  SKIP 2.
+ENDFORM.

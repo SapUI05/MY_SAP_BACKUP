@@ -1,0 +1,169 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad`
+*&  CLIENT      : CE
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Distribution
+*&  START DATE  : 28TH JULY 2025
+*&  END DATE    : 28TH JULY 2025
+*&  PURPOSE     : An application to get data accross different sales
+*&                tables using joins
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_select_joins NO STANDARD PAGE HEADING LINE-SIZE 187.
+
+
+
+**********************************************************************
+**Inner Join on KNA1 AND KNB1
+
+**Decl
+TYPES : BEGIN OF ty_join,
+          kunnr TYPE kna1-kunnr,
+          name1 TYPE kna1-name1,
+          sortl TYPE kna1-sortl,
+          telf1 TYPE kna1-telf1,
+          ort01 TYPE kna1-ort01,
+          regio TYPE kna1-regio,
+          land1 TYPE kna1-land1,
+          spras TYPE kna1-spras,
+          ktokd TYPE kna1-ktokd,
+
+          bukrs TYPE knb1-bukrs,
+          pernr TYPE knb1-pernr,
+          akont TYPE knb1-akont,
+          begru TYPE knb1-begru,
+          ernam TYPE knb1-ernam,
+          erdat TYPE knb1-erdat,
+        END OF ty_join.
+
+FIELD-SYMBOLS <fs_join> TYPE ty_join.
+
+DATA : it_injoin TYPE TABLE OF ty_join WITH HEADER LINE,
+       it_lojoin TYPE TABLE OF ty_join WITH HEADER LINE,
+       lv_cnt    TYPE i.
+
+
+SELECT-OPTIONS s_kunnr FOR it_injoin-kunnr DEFAULT 1 TO 10 .
+
+
+SELECT
+  kna1~kunnr
+  kna1~name1
+  kna1~sortl
+  kna1~telf1
+  kna1~ort01
+  kna1~regio
+  kna1~land1
+  kna1~spras
+  kna1~ktokd
+
+  knb1~bukrs
+  knb1~pernr
+  knb1~akont
+  knb1~begru
+  knb1~ernam
+  knb1~erdat
+        INTO TABLE it_injoin
+        FROM kna1
+        INNER JOIN knb1
+        ON kna1~kunnr = knb1~kunnr
+        WHERE kna1~kunnr IN s_kunnr.
+
+SELECT
+  a1~kunnr
+  a1~name1
+  a1~sortl
+  a1~telf1
+  a1~ort01
+  a1~regio
+  a1~land1
+  a1~spras
+  a1~ktokd
+
+  b1~bukrs
+  b1~pernr
+  b1~akont
+  b1~begru
+  b1~ernam
+  b1~erdat
+        INTO TABLE it_lojoin
+        FROM kna1 AS a1
+        LEFT OUTER JOIN knb1 AS b1
+        ON a1~kunnr = b1~kunnr
+        WHERE a1~kunnr IN s_kunnr.
+
+
+IF sy-subrc <> 0.
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
+
+
+DESCRIBE TABLE it_injoin LINES lv_cnt.
+
+WRITE : / text-ijn , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP.
+ULINE.
+
+LOOP AT it_injoin ASSIGNING <fs_join>.
+  WRITE :  sy-vline,
+           <fs_join>-kunnr COLOR 5 ,
+           <fs_join>-name1 COLOR 5 ,
+           <fs_join>-sortl COLOR 5 ,
+           <fs_join>-telf1 COLOR 5 ,
+           <fs_join>-ort01 COLOR 5 ,
+           <fs_join>-regio COLOR 5 ,
+           <fs_join>-land1 COLOR 5 ,
+           <fs_join>-spras COLOR 5 ,
+           <fs_join>-ktokd COLOR 5 ,
+           sy-vline,
+           <fs_join>-bukrs COLOR 6 ,
+           <fs_join>-pernr COLOR 6 ,
+           <fs_join>-akont COLOR 6 ,
+           <fs_join>-begru COLOR 6 ,
+           <fs_join>-ernam COLOR 6 ,
+           <fs_join>-erdat COLOR 6 ,
+           187 sy-vline .
+  ULINE.
+ENDLOOP.
+
+
+SKIP 2.
+
+DESCRIBE TABLE it_lojoin LINES lv_cnt.
+
+WRITE : / text-ojn , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP.
+ULINE.
+
+
+LOOP AT it_lojoin ASSIGNING <fs_join>.
+  WRITE : / sy-vline,
+            <fs_join>-kunnr COLOR 5 ,
+            <fs_join>-name1 COLOR 5 ,
+            <fs_join>-sortl COLOR 5 ,
+            <fs_join>-telf1 COLOR 5 ,
+            <fs_join>-ort01 COLOR 5 ,
+            <fs_join>-regio COLOR 5 ,
+            <fs_join>-land1 COLOR 5 ,
+            <fs_join>-spras COLOR 5 ,
+            <fs_join>-ktokd COLOR 5 ,
+            sy-vline,
+            <fs_join>-bukrs COLOR 6 ,
+            <fs_join>-pernr COLOR 6 ,
+            <fs_join>-akont COLOR 6 ,
+            <fs_join>-begru COLOR 6 ,
+            <fs_join>-ernam COLOR 6 ,
+            <fs_join>-erdat COLOR 6 ,
+            187 sy-vline .
+  ULINE.
+ENDLOOP.

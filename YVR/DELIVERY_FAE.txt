@@ -1,0 +1,228 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad`
+*&  CLIENT      : CE
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 28TH JULY 2025
+*&  END DATE    : 28TH JULY 2025
+*&  PURPOSE     : An application to get data accross 3 different delivery
+*&                tables using For All Entries
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT ylr_delivery_fae NO STANDARD PAGE HEADING LINE-SIZE 540.
+
+
+
+**********************************************************************
+**Join on LFA1 & EKKO & EKPO
+
+**Type Decleration
+TYPES : BEGIN OF ty_lfa1,
+          lifnr TYPE lfa1-lifnr,
+          name1 TYPE lfa1-name1,
+          anred TYPE lfa1-anred,
+          telf1 TYPE lfa1-telf1,
+          ort01 TYPE lfa1-ort01,
+          regio TYPE lfa1-regio,
+          land1 TYPE lfa1-land1,
+          spras TYPE lfa1-spras,
+          ktokk TYPE lfa1-ktokk,
+        END   OF ty_lfa1,
+        BEGIN OF ty_ekko,
+          lifnr1 TYPE ekko-lifnr,
+          ebeln  TYPE ekko-ebeln,
+          ernam  TYPE ekko-ernam,
+          aedat  TYPE ekko-aedat,
+          ekgrp  TYPE ekko-ekgrp,
+          bsart  TYPE ekko-bsart,
+          rlwrt  TYPE ekko-rlwrt,
+          waers  TYPE ekko-waers,
+        END   OF ty_ekko,
+        BEGIN OF ty_ekpo,
+          ebeln1 TYPE ekpo-ebeln,
+          ematn  TYPE ekpo-ematn,
+          matnr  TYPE ekpo-matnr,
+          ktmng  TYPE ekpo-ktmng,
+          meins  TYPE ekpo-meins,
+          netpr  TYPE ekpo-netpr,
+          netwr  TYPE ekpo-netwr,
+          ean11  TYPE ekpo-ean11,
+        END OF ty_ekpo.
+
+FIELD-SYMBOLS : <fs_lfa1> TYPE ty_lfa1,
+                <fs_ekko> TYPE ty_ekko,
+                <fs_ekpo> TYPE ty_ekpo.
+
+DATA : it_lfa1 TYPE TABLE OF ty_lfa1 WITH HEADER LINE,
+       it_ekko TYPE TABLE OF ty_ekko WITH HEADER LINE,
+       it_ekpo TYPE TABLE OF ty_ekpo WITH HEADER LINE,
+       lv_cnt  TYPE i.
+
+TYPES BEGIN OF ty_join.
+        INCLUDE STRUCTURE :  it_lfa1, it_ekko, it_ekpo.
+TYPES END   OF ty_join.
+
+FIELD-SYMBOLS : <fs_join> TYPE ty_join.
+
+DATA : it_join TYPE TABLE OF ty_join,
+       wa_join TYPE ty_join.
+
+
+SELECT-OPTIONS s_lifnr FOR it_lfa1-lifnr DEFAULT 1 TO 10 OBLIGATORY.
+
+SELECT
+   lifnr
+   name1
+   anred
+   telf1
+   ort01
+   regio
+   land1
+   spras
+   ktokk
+      FROM lfa1
+      INTO TABLE it_lfa1
+      WHERE lfa1~lifnr IN s_lifnr.
+
+IF sy-subrc <> 0.
+  MESSAGE 'No records for current selection in LFA1 table.' TYPE 'E' DISPLAY LIKE 'S' .
+ENDIF.
+
+SELECT
+   lifnr
+   ebeln
+   ernam
+   aedat
+   ekgrp
+   bsart
+   rlwrt
+   waers
+      FROM ekko
+      INTO TABLE it_ekko
+      FOR ALL ENTRIES IN it_lfa1
+      WHERE lifnr = it_lfa1-lifnr.
+
+IF sy-subrc <> 0.
+  MESSAGE 'No matching records for current selection in ekko table.' TYPE 'E' DISPLAY LIKE 'S' .
+ENDIF.
+
+SELECT
+   ebeln
+   ematn
+   matnr
+   ktmng
+   meins
+   netpr
+   netwr
+   ean11
+      FROM ekpo
+      INTO TABLE it_ekpo
+      FOR ALL ENTRIES IN it_ekko
+      WHERE ebeln = it_ekko-ebeln.
+
+IF sy-subrc <> 0.
+  MESSAGE 'No matching records for current selection in ekpo table.' TYPE 'E' DISPLAY LIKE 'S' .
+ENDIF.
+
+
+LOOP AT it_ekpo ASSIGNING <fs_ekpo>.
+  CLEAR wa_join.
+
+  MOVE-CORRESPONDING <fs_ekpo>   TO wa_join.
+  " Read EKKO for current EBELN
+  READ TABLE it_ekko ASSIGNING <fs_ekko> WITH KEY ebeln = <fs_ekpo>-ebeln1.
+  IF sy-subrc = 0.
+    MOVE-CORRESPONDING <fs_ekko> TO wa_join.
+  ENDIF.
+
+  " Read LFA1 using LIFNR from EKKO
+  READ TABLE it_lfa1 ASSIGNING <fs_lfa1> WITH KEY lifnr = <fs_ekko>-lifnr1.
+  IF sy-subrc = 0.
+    MOVE-CORRESPONDING <fs_lfa1> TO wa_join.
+  ENDIF.
+
+  APPEND wa_join TO it_join.
+ENDLOOP.
+
+
+
+
+DESCRIBE TABLE it_join LINES lv_cnt.
+
+WRITE : / text-ijn , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP 2.
+ULINE.
+
+WRITE : text-001 ,
+        text-002 ,
+        text-003 ,
+        text-004 ,
+        text-005 ,
+        text-006 ,
+        text-007 ,
+        text-008 ,
+        text-009 ,             sy-vline,
+                               sy-vline,
+        text-010 ,
+        text-011 ,
+        text-012 ,
+        text-013 ,
+        text-014 ,
+        text-015 ,
+        text-016 ,             sy-vline,
+                               sy-vline,
+        text-017 ,
+        text-018 ,
+        text-019 ,
+        text-020 ,
+        text-021 ,
+        text-022 ,
+        text-023 , AT sy-linsz sy-vline .
+
+
+ULINE.
+
+
+LOOP AT it_join ASSIGNING <fs_join>.
+  WRITE :  sy-vline,
+           <fs_join>-lifnr  COLOR 5 UNDER text-001 ,
+           <fs_join>-name1  COLOR 5 UNDER text-002 ,
+           <fs_join>-anred  COLOR 5 UNDER text-003 ,
+           <fs_join>-telf1  COLOR 5 UNDER text-004 ,
+           <fs_join>-ort01  COLOR 5 UNDER text-005 ,
+           <fs_join>-regio  COLOR 5 UNDER text-006 ,
+           <fs_join>-land1  COLOR 5 UNDER text-007 ,
+           <fs_join>-spras  COLOR 5 UNDER text-008 ,
+           <fs_join>-ktokk  COLOR 5 UNDER text-009 ,
+
+           <fs_join>-ebeln  COLOR 6 UNDER text-010 ,
+           <fs_join>-ernam  COLOR 6 UNDER text-011 ,
+           <fs_join>-aedat  COLOR 6 UNDER text-012 ,
+           <fs_join>-ekgrp  COLOR 6 UNDER text-013 ,
+           <fs_join>-bsart  COLOR 6 UNDER text-014 ,
+           <fs_join>-rlwrt  COLOR 6 UNDER text-015 ,
+           <fs_join>-waers  COLOR 6 UNDER text-016 ,
+
+           <fs_join>-ematn COLOR 7 UNDER text-017 ,
+           <fs_join>-matnr COLOR 7 UNDER text-018 ,
+           <fs_join>-ktmng COLOR 7 UNDER text-019 ,
+           <fs_join>-meins COLOR 7 UNDER text-020 ,
+           <fs_join>-netpr COLOR 7 UNDER text-021 ,
+           <fs_join>-netwr COLOR 7 UNDER text-022 ,
+           <fs_join>-ean11 COLOR 7 UNDER text-023 ,
+
+           AT sy-linsz sy-vline .
+  ULINE.
+ENDLOOP.
+
+
+SKIP 2.

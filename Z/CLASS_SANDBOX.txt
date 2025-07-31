@@ -1,0 +1,55 @@
+REPORT zvr_sales_itab_approaches NO STANDARD PAGE HEADING.
+
+
+DATA: lt_src      TYPE STANDARD TABLE OF string,
+      lv_progname TYPE progname,
+      lt_files    TYPE filetable,
+      lv_file     TYPE file_table,
+      lv_rc       TYPE i,
+      lv_folder   TYPE string.
+
+lv_folder = 'C:\MY_SAP_BACKUP'.
+
+" Get all .txt files in the folder
+CALL METHOD cl_gui_frontend_services=>directory_list_files
+  EXPORTING
+    directory   = lv_folder
+    filter      = '*.txt'
+  CHANGING
+    file_table  = lt_files
+    count       = lv_rc
+  EXCEPTIONS
+    OTHERS      = 1.
+
+LOOP AT lt_files INTO lv_file.
+
+  CLEAR: lt_src, lv_progname.
+
+  " Get program name from file name (e.g. ZTEST_PROG.txt => ZTEST_PROG)
+  lv_progname = lv_file-filename.
+  REPLACE '.txt' IN lv_progname WITH ''.
+
+  " Read file content into lt_src
+  CALL METHOD cl_gui_frontend_services=>gui_upload
+    EXPORTING
+      filename = lv_folder && '\' && lv_file-filename
+
+      filetype = 'ASC'
+    CHANGING
+      data_tab = lt_src
+    EXCEPTIONS
+      OTHERS   = 1.
+
+  IF lt_src IS NOT INITIAL.
+    " Create/overwrite the program
+    INSERT REPORT lv_progname FROM lt_src.
+    IF sy-subrc = 0.
+      WRITE: / 'Imported:', lv_progname.
+    ELSE.
+      WRITE: / 'Error creating:', lv_progname.
+    ENDIF.
+  ELSE.
+    WRITE: / 'Could not read file for:', lv_progname.
+  ENDIF.
+
+ENDLOOP.

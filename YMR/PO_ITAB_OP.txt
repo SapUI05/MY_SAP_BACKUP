@@ -1,0 +1,954 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : VIVO
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 22ND JULY 2025
+*&  END DATE    : 25TH JULY 2025
+*&  PURPOSE     : Application to using internal Table to load(fill)
+*&                move & use all Internal table operations on
+*&                Purchase Order data then display it
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+************************************************************************
+REPORT ymr_po_itab_op NO STANDARD PAGE HEADING .
+************************************************************************
+
+INCLUDE YMI_PO_ITAB_OP_DECL .
+
+INCLUDE ymi_po_itab_selection_screen .
+
+**********************************************************************
+**********************************************************************
+**fetch records from db into Internal Table 1 ************************
+**********************************************************************
+**********************************************************************
+SELECT ebeln
+       aedat
+       verkf
+       ktwrt
+      INTO TABLE it_ekko
+      UP TO 5 ROWS
+      FROM ekko
+      WHERE ebeln IN s_ebeln
+      AND verkf > ''
+      AND ktwrt <> 0.
+**********************************************************************
+**Display error in case of error *************************************
+**********************************************************************
+IF sy-subrc = 4 .
+  MESSAGE s000(zsd_msg_cl) WITH sy-subrc.
+ELSEIF sy-subrc <> 0.
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
+**********************************************************************
+**fetch records from db into Internal Table 2 ************************
+**********************************************************************
+SELECT ebeln
+       aedat
+       verkf
+       ktwrt
+      INTO TABLE it_ekko_2
+      UP TO 15 ROWS
+      FROM ekko
+      WHERE ebeln IN s_ebeln
+      AND ktwrt <> 0.
+**********************************************************************
+**Display error in case of error *************************************
+**********************************************************************
+IF sy-subrc <> 0.  MESSAGE e003(zsd_msg_cl). ENDIF.
+**********************************************************************
+*skip first 5 records in internal Table 2*****************************
+**********************************************************************
+DELETE it_ekko_2 FROM 1 TO 5 .
+**********************************************************************
+**Fetch single record from db and load it to work_area 2 *************
+**********************************************************************
+SELECT SINGLE
+          ebeln
+          aedat
+          verkf
+          ktwrt
+      INTO CORRESPONDING FIELDS OF wa_ekko_2
+      FROM  ekko
+      WHERE ebeln IN s_ebeln
+      AND verkf IS NOT NULL
+      AND ktwrt <> 0.
+**********************************************************************
+**Display error in case of error *************************************
+**********************************************************************
+IF sy-subrc <> 0. MESSAGE e003(zsd_msg_cl). ENDIF.
+**********************************************************************
+
+**define Table width
+lv_tbl_wth = 85 .
+lv_tbl_wth2 = lv_tbl_wth / 2 .
+lv_col_end = lv_tbl_wth + lv_col_strt .
+
+AT SELECTION-SCREEN OUTPUT.
+
+  lv_active_mn = lv_active_sb = lv_active_sb2 = '' .
+
+  lv_showit1 = '' .
+  lv_showit2 = '' .
+  lv_showit3 = '' .
+  lv_showitv = '' .
+  lv_showwa1 = '' .
+  lv_showwa2 = '' .
+  lv_showwav = '' .
+  lv_showfso = '' .
+  lv_showfsv = '' .
+
+
+
+**********************************************************************
+**Main Active ID
+**********************************************************************
+  CASE lv_ischecked .
+    WHEN p_tytran .       lv_active_mn = 'TRN' .
+    WHEN p_tydele .       lv_active_mn = 'DEL' .
+    WHEN p_tychng .       lv_active_mn = 'CNG' .
+    WHEN OTHERS   .       lv_active_mn = 'OTH' .
+  ENDCASE.
+**********************************************************************
+**Sub Active ID 1 ****************************************************
+**********************************************************************
+  CASE lv_active_mn .
+    WHEN 'TRN' .
+      CASE lv_ischecked .
+        WHEN p_trnmnl.
+          lv_active_sb = 'MNL' .
+          lv_showit1 = lv_showit3 = lv_showwa1 = lv_showwa2 = lv_ischecked .
+        WHEN p_trnapd.
+          lv_active_sb = 'APD' .
+
+          lv_showit1 = lv_showit2 = lv_showit3 = lv_showwa1 = lv_showwa2 = lv_ischecked .
+        WHEN p_trnist.
+          lv_active_sb = 'IST' .
+
+          lv_showit1 = lv_showit2 = lv_showit3 =  lv_showwa2 = lv_ischecked .
+        WHEN p_trnclt.
+          lv_active_sb = 'CLT' .
+
+          lv_showit2 = lv_showit3 = lv_ischecked .
+        WHEN p_trnmov.
+          lv_active_sb = 'MOV' .
+
+          lv_showit1 = lv_showit2 = lv_showit3 = lv_showwa1 = lv_showwa2 = lv_ischecked .
+        WHEN p_trnmco.
+          lv_active_sb = 'MCO' .
+
+          lv_showwa2 = lv_showwav = lv_ischecked .
+        WHEN OTHERS.
+          lv_active_sb = 'OTH' .
+      ENDCASE.
+    WHEN 'DEL' .
+      CASE lv_ischecked .
+        WHEN p_delclr.
+          lv_active_sb = 'CLR' .
+          lv_showit2 = lv_ischecked .
+        WHEN p_delrfh.
+          lv_active_sb = 'RFH' .
+          lv_showit2 = lv_ischecked .
+        WHEN p_delfre.
+          lv_active_sb = 'FRE' .
+          lv_showit2 = lv_showwa2 = lv_ischecked .
+        WHEN OTHERS.      lv_active_sb = 'OTH' .
+      ENDCASE.
+    WHEN 'CNG' .
+      CASE lv_ischecked .
+        WHEN p_cngsrt.
+          lv_active_sb = 'SRT' .
+          lv_showit2 = lv_ischecked .
+        WHEN p_cngmdf.
+
+          lv_active_sb = 'MDF' .
+          lv_showwa1 = lv_showit2 = lv_ischecked .
+          IF p_mdfin = lv_ischecked .
+            lv_active_sb2 = 'MFI'.
+          ELSEIF p_mdfco = lv_ischecked .
+            lv_active_sb2 = 'MFC'.
+          ENDIF.
+        WHEN p_cngedc.
+          lv_active_sb = 'EDC' .
+          lv_showitv = lv_showit2 = lv_showwav = lv_showfso = lv_ischecked .
+        WHEN p_cngfld.
+          lv_active_sb = 'FLD' .
+          lv_showit2 = lv_ischecked .
+          lv_showfso = lv_ischecked .
+        WHEN OTHERS.      lv_active_sb = 'OTH' .
+      ENDCASE.
+    WHEN OTHERS.      lv_active_sb = 'OTH' .
+  ENDCASE.
+
+  LOOP AT SCREEN.
+    IF screen-group1 = '' OR screen-group1 IS INITIAL.
+      CONTINUE.
+    ENDIF.
+
+    lv_opt_show = 0 .
+    IF screen-group1 = lv_active_mn
+    OR screen-group1 = lv_active_sb
+    OR screen-group1 = lv_active_sb2
+    OR screen-group1 = 'RNG'
+    OR screen-group1 = 'OMN'.
+      lv_opt_show = 1 .
+    ENDIF.
+
+    screen-input      = lv_opt_show .
+    screen-active     = lv_opt_show .
+    screen-invisible  = 1 - lv_opt_show .
+
+    MODIFY SCREEN.
+  ENDLOOP.
+
+
+  DEFINE print_tables.
+
+    jump_to_next_col .
+**********************************************************************
+**********************************************************************
+**Get internal Table 1 length
+*DESCRIBE Table it_ekko LINES lv_ekko_cnt.
+    lv_ekko_cnt = lines( it_ekko ) .
+**Get internal Table 2 length
+    lv_ekko_cnt2 = lines( it_ekko_2 ) .
+**Get internal Table 3 length
+    lv_ekko_cnt3 = lines( it_ekko_3 ) .
+**Get internal Table varient length
+    lv_ekkov_cnt = lines( it_ekkov ) .
+**********************************************************************
+**Print Before Block**************************************************
+**********************************************************************
+**********************************************************************
+**********************************************************************
+*    WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-023, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+    WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, &1 , AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+*    SKIP.
+
+    IF lv_showfso EQ lv_ischecked .
+
+**********************************************************************
+**Print Main Field Symbol Title **********************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline,
+      text-027,
+      AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Field Symbol 1 records headers *******************************
+**********************************************************************
+      WRITE: AT  lv_col_strt sy-uline(lv_tbl_wth),
+             AT /lv_col_strt sy-vline ,
+               text-003,                                                "          Purchase Document Number
+               text-005,                                                "          Created At
+               text-008,                                                "          SalesPerson responsable at Vendor Office
+               text-009,                                                "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+
+      IF <fs_ekko> IS ASSIGNED.
+**********************************************************************
+**Print Main Field Symbol records data *******************************
+**********************************************************************
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekko>-ebeln UNDER text-003 ,                        "          Purchase Document Number
+                <fs_ekko>-aedat UNDER text-005 ,                        "          Created At
+                <fs_ekko>-verkf UNDER text-008 ,                        "          SalesPerson responsable at Vendor Office
+                <fs_ekko>-ktwrt UNDER text-009 LEFT-JUSTIFIED ,         "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ELSE.
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+      SKIP.
+    ENDIF.
+
+
+
+    IF lv_showfsv EQ lv_ischecked .
+
+**********************************************************************
+**Print Varient Field Symbol Title **********************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline,
+      text-028,
+      AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Varient Field Symbol records headers *******************************
+**********************************************************************
+      WRITE: AT  lv_col_strt sy-uline(lv_tbl_wth),
+             AT /lv_col_strt sy-vline ,
+               text-003,       "Sales Document
+               text-008,       "Sold-to Party
+              AT lv_col_end sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+      IF <fs_ekkov> IS ASSIGNED.
+**********************************************************************
+**Print Varient Field Symbol records data ***************************
+**********************************************************************
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekkov>-ebeln UNDER text-003 ,                       "          Purchase Document Number
+                <fs_ekkov>-verkf UNDER text-008 ,                       "          SalesPerson responsable at Vendor Office
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ELSE.
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+    SKIP.
+    ENDIF .
+
+    IF lv_showwa1 EQ lv_ischecked .
+**********************************************************************
+**Print Work Area 1 Title ********************************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-019, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Work Area 1 records headers **********************************
+**********************************************************************
+      WRITE: AT  lv_col_strt sy-uline(lv_tbl_wth),
+             AT /lv_col_strt sy-vline ,
+                text-003,                                                 "          Purchase Document Number
+                text-005,                                                 "          Created At
+                text-008,                                                 "          SalesPerson responsable at Vendor Office
+                text-009,                                                 "          Target Value - HA per Dist
+             AT lv_col_end sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area 1 records data *************************************
+**********************************************************************
+      WRITE: AT /lv_col_strt sy-vline ,
+                wa_ekko-ebeln UNDER text-003 ,                            "          Purchase Document Number
+                wa_ekko-aedat UNDER text-005 ,                            "          Created At
+                wa_ekko-verkf UNDER text-008 ,                            "          SalesPerson responsable at Vendor Office
+                wa_ekko-ktwrt UNDER text-009 LEFT-JUSTIFIED ,             "          Target Value - HA per Dist
+             AT lv_col_end sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+
+      SKIP.
+    ENDIF.
+    IF lv_showwa2 EQ lv_ischecked .
+**********************************************************************
+**Print Work Area 2 Title ********************************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-013, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Work Area 2 records headers **********************************
+**********************************************************************
+      WRITE: AT lv_col_strt  sy-uline(lv_tbl_wth),
+             AT /lv_col_strt sy-vline ,
+                text-003,       "Sales Document
+                text-005,       "Creation Date
+                text-008,       "Sold-to Party
+                text-009,       "Net Value
+             AT lv_col_end   sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area 2 records data *************************************
+**********************************************************************
+      WRITE: AT /lv_col_strt sy-vline ,
+                wa_ekko_2-ebeln UNDER text-003 ,                          "          Purchase Document Number
+                wa_ekko_2-aedat UNDER text-005 ,                          "          Created At
+                wa_ekko_2-verkf UNDER text-008 ,                          "          SalesPerson responsable at Vendor Office
+                wa_ekko_2-ktwrt UNDER text-009 LEFT-JUSTIFIED ,           "          Target Value - HA per Dist
+             AT lv_col_end   sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+
+      SKIP.
+
+    ENDIF.
+    IF lv_showwav EQ lv_ischecked .
+**********************************************************************
+**Print Work Area Variable Title *************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-022, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Work Area Variable records headers ***************************
+      WRITE: AT  lv_col_strt sy-uline(lv_tbl_wth),
+             AT /lv_col_strt sy-vline ,
+               text-003,                                                "          Purchase Document Number
+               text-008,                                                "          SalesPerson responsable at Vendor Office
+              AT lv_col_end sy-vline,
+             AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area Variable records data ******************************
+      WRITE: AT /lv_col_strt sy-vline ,
+              wa_ekkov-ebeln UNDER text-003 ,                           "          Purchase Document Number
+              wa_ekkov-verkf UNDER text-008 ,                           "          SalesPerson responsable at Vendor Office
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+
+      SKIP.
+
+    ENDIF.
+    IF lv_showit1 EQ lv_ischecked .
+
+**Print Internal Table 1 title
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-011, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+**Print internal Table 1 length
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-002 , text-011, lv_ekko_cnt , AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Internal Table 1 record headers
+      WRITE: AT lv_col_strt sy-uline(lv_tbl_wth),
+            AT /lv_col_strt sy-vline ,
+               text-003,                                                "          Purchase Document Number
+               text-005,                                                "          Created At
+               text-008,                                                "          SalesPerson responsable at Vendor Office
+               text-009,                                                "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Internal Table 1 record data
+      LOOP AT it_ekko ASSIGNING <fs_ekko> .
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekko>-ebeln UNDER text-003 ,                        "          Purchase Document Number
+                <fs_ekko>-aedat UNDER text-005 ,                        "          Created At
+                <fs_ekko>-verkf UNDER text-008 ,                        "          SalesPerson responsable at Vendor Office
+                <fs_ekko>-ktwrt UNDER text-009 LEFT-JUSTIFIED ,         "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDLOOP.
+      IF <fs_ekko> IS ASSIGNED.
+        WRITE: AT /lv_col_strt sy-vline ,
+                    <fs_ekko>-ebeln UNDER text-003 ,                    "          Purchase Document Number
+                    <fs_ekko>-aedat UNDER text-005 ,                    "          Created At
+                    <fs_ekko>-verkf UNDER text-008 ,                    "          SalesPerson responsable at Vendor Office
+                    <fs_ekko>-ktwrt UNDER text-009 LEFT-JUSTIFIED ,     "          Target Value - HA per Dist
+                  AT lv_col_end sy-vline,
+                  AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF.
+**If empty
+      IF lv_ekko_cnt = 0 .
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+      SKIP.
+
+    ENDIF.
+    IF lv_showit2 EQ lv_ischecked .
+
+**Print Internal Table 2 title
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-012, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+**Print internal Table 2 length
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-002 , text-012, lv_ekko_cnt2 , AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Internal Table 2 record headers
+      WRITE: AT lv_col_strt sy-uline(lv_tbl_wth),
+            AT /lv_col_strt sy-vline ,
+               text-003,                                                "          Purchase Document Number
+               text-005,                                                "          Created At
+               text-008,                                                "          SalesPerson responsable at Vendor Office
+               text-009,                                                "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Internal Table 2 record data
+      LOOP AT it_ekko_2 ASSIGNING <fs_ekko> .
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekko>-ebeln UNDER text-003 ,                        "          Purchase Document Number
+                <fs_ekko>-aedat UNDER text-005 ,                        "          Created At
+                <fs_ekko>-verkf UNDER text-008 ,                        "          SalesPerson responsable at Vendor Office
+                <fs_ekko>-ktwrt UNDER text-009 LEFT-JUSTIFIED ,         "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDLOOP.
+**********************************************************************
+**If empty ***********************************************************
+**********************************************************************
+      IF lv_ekko_cnt2 = 0 .
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+      SKIP.
+
+    ENDIF.
+    IF lv_showit3 EQ lv_ischecked .
+**********************************************************************
+**Print Internal Table 3 title ***************************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-016, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+**********************************************************************
+**Print internal Table 3 length **************************************
+**********************************************************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-002 , text-016, lv_ekko_cnt3 , AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+      SKIP.
+**********************************************************************
+**Print Internal Table 3 record headers ******************************
+**********************************************************************
+      WRITE: AT lv_col_strt sy-uline(lv_tbl_wth),
+            AT /lv_col_strt sy-vline ,
+               text-003,                                                "          Purchase Document Number
+               text-005,                                                "          Created At
+               text-008,                                                "          SalesPerson responsable at Vendor Office
+               text-009,                                                "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Internal Table 3 record data *********************************
+**********************************************************************
+      LOOP AT it_ekko_3 ASSIGNING <fs_ekko> .
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekko>-ebeln UNDER text-003 ,                        "          Purchase Document Number
+                <fs_ekko>-aedat UNDER text-005 ,                        "          Created At
+                <fs_ekko>-verkf UNDER text-008 ,                        "          SalesPerson responsable at Vendor Office
+                <fs_ekko>-ktwrt UNDER text-009 LEFT-JUSTIFIED ,         "          Target Value - HA per Dist
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDLOOP.
+**********************************************************************
+**If empty ***********************************************************
+**********************************************************************
+      IF lv_ekko_cnt3 = 0 .
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+      SKIP.
+
+    ENDIF.
+
+*********************************************************************
+*Print Internal Table Varient *********************************
+*********************************************************************
+    IF lv_showitv EQ lv_ischecked .
+*Print Internal Table Varient title *********************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt sy-vline, text-020, AT lv_col_end sy-vline, AT /lv_col_strt sy-uline(lv_tbl_wth) .
+*Print Internal Table Varient length ********************************
+      WRITE : AT lv_col_strt sy-uline(lv_tbl_wth), AT /lv_col_strt  sy-vline, text-002 , text-020, lv_ekkov_cnt , AT lv_col_end sy-vline, AT /lv_col_strt  sy-uline(lv_tbl_wth) .
+      SKIP.
+*Print Internal Table varient record headers ************************
+      WRITE: AT lv_col_strt  sy-uline(lv_tbl_wth),
+             AT /lv_col_strt  sy-vline ,
+             text-003,                                                  "          Purchase Document Number
+             text-008,                                                  "          SalesPerson responsable at Vendor Office
+             AT lv_col_end sy-vline,
+             AT /lv_col_strt  sy-uline(lv_tbl_wth).
+*Print Internal Table Varient record data ***************************
+      LOOP AT it_ekkov ASSIGNING <fs_ekkov> .
+        WRITE: AT /lv_col_strt sy-vline ,
+                <fs_ekkov>-ebeln UNDER text-003 ,                     "          Purchase Document Number
+                <fs_ekkov>-verkf UNDER text-008 ,                     "          SalesPerson responsable at Vendor Office
+              AT lv_col_end sy-vline,
+              AT /lv_col_strt  sy-uline(lv_tbl_wth).
+      ENDLOOP.
+*If empty ************************************************************
+      IF lv_ekkov_cnt = 0 .
+        WRITE: AT /lv_col_strt  sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_col_end sy-vline,
+            AT /lv_col_strt sy-uline(lv_tbl_wth).
+      ENDIF .
+    ENDIF .
+
+
+    SKIP 3.
+**********************************************************************
+**End of table screen ************************************************
+**********************************************************************
+  END-OF-DEFINITION.
+**********************************************************************
+**Data Transfer Logic*************************************************
+**********************************************************************
+  DEFINE execute_transfer_logic.
+    CASE lv_active_sb .
+**********************************************************************
+**Data Transfer Using Manual Transfer ********************************
+**********************************************************************
+      WHEN 'MNL' .
+        it_ekko_3 = it_ekko .
+        wa_ekko   = wa_ekko_2 .
+**********************************************************************
+**Data Transfer Using Append *****************************************
+**********************************************************************
+      WHEN 'APD' .
+**Populating Empty Table
+        APPEND LINES OF it_ekko_2 TO it_ekko_3 .
+**Data Transfer Using Append - WA to IT
+        APPEND wa_ekko_2 TO it_ekko_2 .
+        IF sy-subrc <> 0.   MESSAGE e004(zsd_msg_cl). ENDIF.            "Display error in case of error
+**Data Transfer Using Append
+        IF p_apdfrm IS INITIAL.
+          APPEND LINES OF it_ekko TO it_ekko_3 .
+        ELSEIF p_apd_to IS INITIAL.
+          APPEND LINES OF it_ekko FROM p_apdfrm TO it_ekko_3 .
+        ELSE.
+          APPEND LINES OF it_ekko  FROM p_apdfrm TO p_apd_to TO it_ekko_3 .
+        ENDIF.
+        IF sy-subrc <> 0.   MESSAGE e005(zsd_msg_cl). ENDIF.            "Display error in case of
+**********************************************************************
+**Data Transfer using Insert *****************************************
+**********************************************************************
+      WHEN 'IST' .
+**Populating Empty Table
+        APPEND LINES OF it_ekko_2 TO it_ekko_3 .
+**Data Transfer using Insert - WA to IT
+        INSERT wa_ekko_2 INTO it_ekko_2  INDEX p_istind.
+        IF sy-subrc <> 0.   MESSAGE e006(zsd_msg_cl). ENDIF.            "Display error in case of error
+**Data Transfer using Insert
+        IF p_istfrm IS INITIAL.
+          INSERT LINES OF it_ekko INTO it_ekko_3 INDEX p_istind.
+        ELSEIF p_ist_to IS INITIAL.
+          INSERT LINES OF it_ekko FROM p_istfrm INTO it_ekko_3 INDEX p_istind .
+        ELSE.
+          INSERT LINES OF it_ekko  FROM p_istfrm TO p_ist_to INTO it_ekko_3 INDEX p_istind .
+        ENDIF.
+        IF sy-subrc <> 0.   MESSAGE e007(zsd_msg_cl). ENDIF.            "Display error in case of error
+**********************************************************************
+**Data Transfer using collect ****************************************
+**********************************************************************
+      WHEN 'CLT' .
+        IF p_clttim > 0 .
+          DO p_clttim TIMES .
+            LOOP AT it_ekko_2 INTO wa_ekko .
+**Data Transfer using collect - WA to IT
+              COLLECT wa_ekko INTO it_ekko_3 .
+            ENDLOOP.
+          ENDDO.
+        ENDIF.
+**********************************************************************
+**Data Transfer Using Move *******************************************
+**********************************************************************
+      WHEN 'MOV' .
+**Populating Empty Table
+        APPEND LINES OF it_ekko_2 TO it_ekko_3 .
+        IF sy-subrc <> 0.   MESSAGE e008(zsd_msg_cl) WITH 'appending' text-012 text-016 794 . ENDIF.      "Display error in case of error
+**Data Transfer Using Append - WA to IT
+        MOVE wa_ekko_2 TO wa_ekko .
+****Not Allowed As Structure is not same
+***      MOVE wa_ekko_2 TO wa_ekkov .
+        IF sy-subrc <> 0.   MESSAGE e008(zsd_msg_cl) WITH 'moving' 'Work area 2' 'Work area 1' 799 . ENDIF.                   "Display error in case of error
+**Data Transfer Using Move
+        MOVE it_ekko TO it_ekko_3 .
+        IF sy-subrc <> 0.   MESSAGE e008(zsd_msg_cl) WITH 'moving' 'Internal Table 1' 'Internal Table 3' 802 . ENDIF.         "Display error in case of
+**********************************************************************
+**Data Transfer Using Move CORRESPONDING *****************************
+**********************************************************************
+      WHEN 'MCO' .
+**********************************************************************
+**Transfer from and to different Structures **************************
+**********************************************************************
+        MOVE-CORRESPONDING wa_ekko_2 TO wa_ekkov .
+        CASE sy-subrc.
+          WHEN 4 OR 0.
+          WHEN OTHERS.
+            MESSAGE e010(zsd_msg_cl) WITH 'using move corresponding' 'Work Area 2' 'Work Area Varient' sy-subrc .             "Display error in case of
+        ENDCASE.
+**********************************************************************
+**Clear **************************************************************
+**********************************************************************
+      WHEN 'CLR' .
+        CLEAR wa_ekko_2 .
+        CLEAR it_ekko_2 .
+**********************************************************************
+**Refresh ************************************************************
+**********************************************************************
+      WHEN 'RFH' .
+        REFRESH it_ekko_2 .
+**********************************************************************
+**Free ***************************************************************
+**********************************************************************
+      WHEN 'FRE' .
+        FREE wa_ekko_2 .
+        FREE it_ekko_2 .
+**********************************************************************
+**Sorting Logic ******************************************************
+**********************************************************************
+      WHEN 'SRT' .
+        IF p_sebeln = 'X' AND p_saedat = 'X' AND p_sverkf = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln aedat verkf ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln aedat verkf ktwrt.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_saedat = 'X' AND p_sverkf = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln aedat verkf DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln aedat verkf.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_saedat = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln aedat ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln aedat ktwrt.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_sverkf = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln verkf ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln verkf ktwrt.
+          ENDIF.
+
+        ELSEIF p_saedat = 'X' AND p_sverkf = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY aedat verkf ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY aedat verkf ktwrt.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_saedat = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln aedat DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln aedat.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_sverkf = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln verkf DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln verkf.
+          ENDIF.
+
+        ELSEIF p_saedat = 'X' AND p_sverkf = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY aedat verkf DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY aedat verkf.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln ktwrt.
+          ENDIF.
+
+        ELSEIF p_saedat = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY aedat ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY aedat ktwrt.
+          ENDIF.
+
+        ELSEIF p_sverkf = 'X' AND p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY verkf ktwrt DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY verkf ktwrt.
+          ENDIF.
+
+        ELSEIF p_sebeln = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ebeln DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY ebeln.
+          ENDIF.
+
+        ELSEIF p_saedat = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY aedat DESCENDING.
+          ELSE.
+            SORT it_ekko_2 BY aedat.
+          ENDIF.
+
+        ELSEIF p_sverkf = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY verkf DESCENDING .
+          ELSE.
+            SORT it_ekko_2 BY verkf .
+          ENDIF.
+
+        ELSEIF p_sktwrt = 'X'.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ktwrt DESCENDING .
+          ELSE.
+            SORT it_ekko_2 BY ktwrt .
+          ENDIF.
+
+        ELSE.
+          IF p_soda = 'X'.
+            SORT it_ekko_2 BY ktwrt DESCENDING .
+          ELSE.
+            SORT it_ekko_2 BY ktwrt .
+          ENDIF.
+        ENDIF.
+**********************************************************************
+**Modify Table *******************************************************
+**********************************************************************
+      WHEN 'MDF' .
+
+        wa_ekko-ebeln = p_vebeln .
+        wa_ekko-aedat = p_vaedat .
+        wa_ekko-verkf = p_vverkf .
+        wa_ekko-ktwrt = p_vktwrt .
+
+        IF it_ekko_2 IS INITIAL. ENDIF.
+
+        IF p_mdfin = lv_ischecked .
+
+          IF p_vebeln IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko INDEX p_mindv TRANSPORTING ebeln .            ENDIF .
+          IF p_vaedat IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko INDEX p_mindv TRANSPORTING aedat .            ENDIF .
+          IF p_vverkf IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko INDEX p_mindv TRANSPORTING verkf .            ENDIF .
+          IF p_vktwrt IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko INDEX p_mindv TRANSPORTING ktwrt .            ENDIF .
+
+        ELSEIF p_mdfco = lv_ischecked .
+
+          IF p_vebeln IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko TRANSPORTING ebeln WHERE verkf EQ p_mconv .   ENDIF .
+          IF p_vaedat IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko TRANSPORTING aedat WHERE verkf EQ p_mconv .   ENDIF .
+          IF p_vverkf IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko TRANSPORTING verkf WHERE verkf EQ p_mconv .   ENDIF .
+          IF p_vktwrt IS NOT INITIAL .  MODIFY it_ekko_2 FROM wa_ekko TRANSPORTING ktwrt WHERE verkf EQ p_mconv .   ENDIF .
+
+        ENDIF.
+        IF it_ekko_2 IS INITIAL. ENDIF.
+**********************************************************************
+**Editor Call ********************************************************
+**********************************************************************
+      WHEN 'EDC' .
+        REFRESH it_ekkov .
+        LOOP AT it_ekko_2 ASSIGNING <fs_ekko> .
+          FREE wa_ekkov.
+          MOVE-CORRESPONDING <fs_ekko> TO wa_ekkov .
+          APPEND wa_ekkov TO it_ekkov.
+        ENDLOOP.
+        EDITOR-CALL FOR it_ekkov.
+      WHEN 'FLD' .
+        READ TABLE it_ekko_2 ASSIGNING <fs_ekko> INDEX 1.
+        READ TABLE it_ekko_2 ASSIGNING <fs_ekko> WITH KEY ebeln = 1 .
+      WHEN OTHERS .
+        MESSAGE e009(zsd_msg_cl) WITH lv_active_sb 325 .                  "   Display error in case of if unknown SUB ACTIVE SECTION ID
+    ENDCASE.
+**********************************************************************
+**********************************************************************
+  END-OF-DEFINITION.
+**********************************************************************
+**********************************************************************
+**Jump to next column ************************************************
+**********************************************************************
+  DEFINE jump_to_next_col .
+    IF lv_line_strt IS INITIAL.
+      lv_line_strt = sy-linno .
+    ELSE.
+      sy-linno = lv_line_strt .
+      lv_col_strt = lv_tbl_wth + lv_tbl_gap + lv_col_strt .
+    ENDIF.
+    lv_col_end = lv_tbl_wth + lv_col_strt - 1 .
+    lv_tbl_wth2 = lv_tbl_wth2 + lv_col_strt .
+  END-OF-DEFINITION.
+**********************************************************************
+***Compute Sort text *************************************************
+**********************************************************************
+  DEFINE compute_sort_text.
+**********************************************************************
+****Reset Sort Order Display Label ***********************************
+**********************************************************************
+    lv_sort_order = '' .
+
+    IF p_sebeln = lv_ischecked .
+      lv_sort_order = |"{ text-003 }"|.
+    ENDIF.
+
+    IF p_saedat = lv_ischecked .
+      lv_tmp_string = |"{ text-005 }"| .
+      IF lv_sort_order = ''.
+        lv_sort_order = lv_tmp_string .
+      ELSE.
+        CONCATENATE lv_sort_order lv_sort_sep lv_tmp_string INTO lv_sort_order SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+
+    IF p_sverkf = lv_ischecked .
+      lv_tmp_string = |"{ text-008 }"| .
+      IF lv_sort_order = ''.
+        lv_sort_order = lv_tmp_string .
+      ELSE.
+        CONCATENATE lv_sort_order lv_sort_sep lv_tmp_string INTO lv_sort_order SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+
+    IF p_sktwrt = lv_ischecked .
+      lv_tmp_string = |"{ text-009 }"| .
+      IF lv_sort_order = ''.
+        lv_sort_order = lv_tmp_string .
+      ELSE.
+        CONCATENATE lv_sort_order lv_sort_sep lv_tmp_string INTO lv_sort_order SEPARATED BY space.
+      ENDIF.
+    ENDIF.
+
+    IF lv_sort_order = ''.
+      lv_sort_order = text-024.
+    ENDIF.
+
+    IF p_sodd = lv_ischecked .
+      CONCATENATE lv_sort_order 'In Descending Order' INTO lv_sort_order SEPARATED BY space.
+    ELSE.
+      CONCATENATE lv_sort_order 'In Ascending Order' INTO lv_sort_order SEPARATED BY space.
+    ENDIF.
+
+  END-OF-DEFINITION.
+
+**********************************************************************
+**********************************************************************
+START-OF-SELECTION . "************************************************
+**********************************************************************
+**********************************************************************
+compute_sort_text.
+**********************************************************************
+**********************************************************************
+**Operation Description **********************************************
+**********************************************************************
+  CASE lv_active_sb .
+**Data Transfer
+    WHEN 'MNL' .  WRITE : text-mnl .
+    WHEN 'APD' .  WRITE : text-apd .
+    WHEN 'IST' .  WRITE : text-ist .
+    WHEN 'CLT' .  WRITE : text-clt .
+    WHEN 'MOV' .  WRITE : text-mov .
+    WHEN 'MCO' .  WRITE : text-mco .
+**Unconditional Deletion
+    WHEN 'CLR' .  WRITE : text-clr .
+    WHEN 'RFH' .  WRITE : text-rfh .
+    WHEN 'FRE' .  WRITE : text-fre .
+**Data Change operations
+    WHEN 'SRT' .  WRITE : text-srt , 'By' , lv_sort_order .
+    WHEN 'MDF' .  WRITE : text-mdf .
+    WHEN 'EDC' .  WRITE : text-edc .
+    WHEN 'FLD' .  WRITE : text-fld .
+
+    WHEN OTHERS . WRITE : text-oth, lv_active_sb .
+  ENDCASE.
+  SKIP.
+
+**********************************************************************
+**Print Before Table  ************************************************
+**********************************************************************
+  print_tables text-023 .
+
+
+**********************************************************************
+  execute_transfer_logic.
+**********************************************************************
+**********************************************************************
+
+
+**********************************************************************
+**Print After Table  *************************************************
+**********************************************************************
+  print_tables : text-021.

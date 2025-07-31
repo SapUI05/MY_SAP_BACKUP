@@ -1,0 +1,5 @@
+
+SELECT-OPTIONS : s_kunnr FOR wa_kna1-kunnr,
+                 s_land1 FOR wa_kna1-land1 NO INTERVALS.
+
+PARAMETERS : p_ktokd TYPE kna1-ktokd OBLIGATORY DEFAULT '0001' .

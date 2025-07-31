@@ -1,0 +1,103 @@
+
+**********************************************************************
+**Selection Screen - Value
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-001 .
+SELECT-OPTIONS : s_ebeln FOR wa_ekko-ebeln      MODIF ID rng.
+SELECTION-SCREEN END   OF BLOCK inp .
+**Selection Screen - Config
+SELECTION-SCREEN BEGIN OF BLOCK cnf WITH FRAME TITLE text-017 .
+**Internal Table Operation Type
+SELECTION-SCREEN COMMENT  /1(30)   text-018     MODIF ID omn .
+PARAMETERS : p_tytran RADIOBUTTON GROUP     typ MODIF ID omn USER-COMMAND optyp  DEFAULT 'X',
+             p_tydele RADIOBUTTON GROUP     typ MODIF ID omn,
+             p_tychng RADIOBUTTON GROUP     typ MODIF ID omn.
+**Data Transfer Operation Type
+SELECTION-SCREEN SKIP .
+SELECTION-SCREEN COMMENT  /1(30)       text-trn MODIF ID trn .
+PARAMETERS : p_trnmnl RADIOBUTTON GROUP     trn MODIF ID trn USER-COMMAND optrn DEFAULT 'X',
+             p_trnapd RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnist RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnclt RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnmov RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnmco RADIOBUTTON GROUP     trn MODIF ID trn.
+SELECTION-SCREEN SKIP .
+**Data Delete Operation Type
+SELECTION-SCREEN COMMENT  1(30)        text-del MODIF ID del .
+PARAMETERS : p_delclr RADIOBUTTON GROUP     del MODIF ID del USER-COMMAND opdel DEFAULT 'X',
+             p_delrfh RADIOBUTTON GROUP     del MODIF ID del,
+             p_delfre RADIOBUTTON GROUP     del MODIF ID del.
+SELECTION-SCREEN SKIP .
+**Data Change Operation Type
+SELECTION-SCREEN COMMENT  1(30)        text-cng MODIF ID cng .
+PARAMETERS : p_cngsrt RADIOBUTTON GROUP     cng MODIF ID cng USER-COMMAND opcng DEFAULT 'X',
+             p_cngmdf RADIOBUTTON GROUP     cng MODIF ID cng,
+             p_cngedc RADIOBUTTON GROUP     cng MODIF ID cng,
+             p_cngfld RADIOBUTTON GROUP     cng MODIF ID cng.
+SELECTION-SCREEN SKIP .
+**********************************************************************
+**Data Transfer Config ***********************************************
+**********************************************************************
+**Append Operation Selection
+SELECTION-SCREEN COMMENT  /1(70)  text-001      MODIF ID apd .
+PARAMETERS : p_apdfrm TYPE i                    MODIF ID apd,
+             p_apd_to TYPE i                    MODIF ID apd.
+**Insert Operation Selection
+SELECTION-SCREEN COMMENT  /1(70)  text-014      MODIF ID ist .
+PARAMETERS : p_istind TYPE i                    MODIF ID ist  OBLIGATORY DEFAULT 1,
+             p_istfrm TYPE i                    MODIF ID ist,
+             p_ist_to TYPE i                    MODIF ID ist.
+**Sort Operation Details**********************************************
+SELECTION-SCREEN COMMENT  /1(79)  text-srt      MODIF ID srt .
+SELECTION-SCREEN COMMENT  /1(1)   text-blk      MODIF ID srt .
+**Sort Fields Selection
+SELECTION-SCREEN COMMENT  /1(70)  text-015      MODIF ID srt .
+PARAMETERS : p_sebeln AS CHECKBOX               MODIF ID srt,
+             p_saedat AS CHECKBOX               MODIF ID srt,
+             p_sverkf AS CHECKBOX               MODIF ID srt,
+             p_sktwrt AS CHECKBOX               MODIF ID srt.
+SELECTION-SCREEN COMMENT  /1(1)   text-blk      MODIF ID srt .
+SELECTION-SCREEN COMMENT  /1(70)  text-017      MODIF ID srt .
+PARAMETERS : p_soda RADIOBUTTON GROUP ordr      MODIF ID srt,
+             p_sodd RADIOBUTTON GROUP ordr      MODIF ID srt.
+**Sort Operation Details**********************************************
+SELECTION-SCREEN COMMENT  /1(79)  text-mdf      MODIF ID mdf .          "parameter > wa1 modify at/when x in it2
+SELECTION-SCREEN COMMENT  /1(1)   text-blk      MODIF ID mdf .
+***Modify Table
+SELECTION-SCREEN COMMENT  /1(70)   text-025     MODIF ID mdf .
+PARAMETERS : p_mdfin RADIOBUTTON GROUP mdft     MODIF ID mdf  USER-COMMAND mdftg DEFAULT 'X',
+             p_mdfco RADIOBUTTON GROUP mdft     MODIF ID mdf.
+SELECTION-SCREEN COMMENT :  /1(1)  text-blk     MODIF ID mdf .
+PARAMETERS : p_mindv TYPE   i                   MODIF ID mfi OBLIGATORY DEFAULT 1,
+             p_mconv TYPE   ekko-verkf          MODIF ID mfc OBLIGATORY DEFAULT 'Ms Black'.
+SELECTION-SCREEN COMMENT    /1(1)  text-blk     MODIF ID mdf .
+SELECTION-SCREEN COMMENT    /1(70) text-026     MODIF ID mdf .
+PARAMETERS : p_vebeln TYPE  ekko-ebeln          MODIF ID mdf,
+             p_vaedat TYPE  ekko-aedat          MODIF ID mdf,
+             p_vverkf TYPE  ekko-verkf          MODIF ID mdf,
+             p_vktwrt TYPE  ekko-ktwrt          MODIF ID mdf.
+**Field Symbol and Read Table ****************************************
+**********************************************************************
+**********************************************************************
+**Manual transfer process Details*************************************
+**********************************************************************
+**********************************************************************
+SELECTION-SCREEN COMMENT  /1(79)      text-mnl  MODIF ID mnl .
+**Append Operation Details********************************************
+SELECTION-SCREEN COMMENT  /1(79)      text-apd  MODIF ID apd .
+**Insert Operation Details********************************************
+SELECTION-SCREEN COMMENT  /1(79)      text-ist  MODIF ID ist .
+**Collect Operation Details********************************************
+PARAMETERS :
+p_clttim TYPE i OBLIGATORY DEFAULT 1            MODIF ID clt .
+SELECTION-SCREEN COMMENT  /1(79)      text-clt  MODIF ID clt .
+**Move Operation Details***********************************************
+SELECTION-SCREEN COMMENT  /1(79)      text-mov  MODIF ID mov .
+**Move Corresponding Operation Details*********************************
+SELECTION-SCREEN COMMENT  /1(79)      text-mco  MODIF ID mco .
+**Editor Call - Operation Details*********************************
+SELECTION-SCREEN COMMENT  /1(79)      text-edc  MODIF ID edc .
+**Field Symbol Operation Details*********************************
+SELECTION-SCREEN COMMENT  /1(79)      text-fld  MODIF ID fld .
+SELECTION-SCREEN END   OF BLOCK cnf .
+**********************************************************************
+**********************************************************************

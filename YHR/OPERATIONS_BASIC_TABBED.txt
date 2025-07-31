@@ -23,10 +23,9 @@ REPORT yhr_operations_basic_tabbed NO STANDARD PAGE HEADING.
 DATA : lv_rev_res   TYPE string,
        lv_strlen    TYPE string,
        lv_sft_mod   TYPE string,
-       lv_cds_def   TYPE string,
-       lv_cds_gap   TYPE string,
-       lv_trans_up  TYPE string,
-       lv_trans_lo  TYPE string,
+       lv_cds_res   TYPE string,
+       lv_transres  TYPE string,
+       lv_tempstr   TYPE string,
        lv_repl_1    TYPE string,
        lv_repl_all  TYPE string,
        lv_spres1    TYPE string,
@@ -111,16 +110,18 @@ PARAMETERS : p_sinsft TYPE string MODIF ID s03 DEFAULT 'JAVASCRIPT',            
 SELECTION-SCREEN END   OF BLOCK stft.
 
 **********************************************************************
-**Input String to reverse
+**Input String to condense
 SELECTION-SCREEN BEGIN OF BLOCK stco WITH FRAME TITLE text-rev.
-PARAMETERS : p_sinre7 TYPE string MODIF ID s02 LOWER CASE
-DEFAULT 'Some random      spaces          text. Hello          World   '.                  "String Input to get Condense
+PARAMETERS : p_sinco TYPE string MODIF ID s04 LOWER CASE
+DEFAULT 'Some random      spaces          text. Hello          World   ',                 "String Input to get Condense
+             p_sincg RADIOBUTTON GROUP cogp MODIF ID s04 ,                                              "Default  Condense
+             p_sincw RADIOBUTTON GROUP cogp MODIF ID s04 .                                              "Condense without gaps
 SELECTION-SCREEN END   OF BLOCK stco.
 
 **********************************************************************
 **Input String to reverse
 SELECTION-SCREEN BEGIN OF BLOCK stre1 WITH FRAME TITLE text-rev.
-PARAMETERS : p_sinre TYPE string MODIF ID s02 LOWER CASE DEFAULT 'USA'.                   "String Input to get REverse
+PARAMETERS : p_sinre TYPE string MODIF ID s05 LOWER CASE DEFAULT 'USA'.                   "String Input to get REverse
 SELECTION-SCREEN END   OF BLOCK stre1.
 
 
@@ -140,17 +141,17 @@ AT SELECTION-SCREEN OUTPUT.
 **Get Sub Active Option
   IF ( lv_mn_active = 'SSL' ).
     CASE 'X'.
-      WHEN p_stlen.   lv_sb_active = 'S01'.
-      WHEN p_strev.   lv_sb_active = 'S02'.
-      WHEN p_stsft.   lv_sb_active = 'S03'.
-      WHEN p_stcds.   lv_sb_active = 'S04'.
-      WHEN p_sttra.   lv_sb_active = 'S05'.
-      WHEN p_strep.   lv_sb_active = 'S06'.
-      WHEN p_stspt.   lv_sb_active = 'S07'.
-      WHEN p_stfnd.   lv_sb_active = 'S08'.
-      WHEN p_stsst.   lv_sb_active = 'S09'.
-      WHEN p_stjon.   lv_sb_active = 'S0A'.
-      WHEN OTHERS.    lv_sb_active = 'OTH'.
+      WHEN p_stlen. lv_sb_active = 'S01'.
+      WHEN p_strev. lv_sb_active = 'S02'.
+      WHEN p_stsft. lv_sb_active = 'S03'.
+      WHEN p_stcds. lv_sb_active = 'S04'.
+      WHEN p_sttra. lv_sb_active = 'S05'.
+      WHEN p_strep. lv_sb_active = 'S06'.
+      WHEN p_stspt. lv_sb_active = 'S07'.
+      WHEN p_stfnd. lv_sb_active = 'S08'.
+      WHEN p_stsst. lv_sb_active = 'S09'.
+      WHEN p_stjon. lv_sb_active = 'S0A'.
+      WHEN OTHERS.  lv_sb_active = 'OTH'.
     ENDCASE.
   ENDIF.
 
@@ -162,10 +163,9 @@ AT SELECTION-SCREEN OUTPUT.
 
     lv_show = 0.
 
-    IF
-      screen-group1 = lv_mn_active OR
-       screen-group1 = lv_sb_active OR
-      screen-group1 = 'MSL' .
+    IF  screen-group1 = lv_mn_active OR
+        screen-group1 = lv_sb_active OR
+        screen-group1 = 'MSL' .
       lv_show = 1.
     ENDIF.
 
@@ -179,13 +179,36 @@ AT SELECTION-SCREEN OUTPUT.
 
 
 START-OF-SELECTION.
-
+**Get string length
   IF lv_sb_active = 'S01' .
     lv_strlen = strlen( p_sinlen ).
-    WRITE : 'Length of string "', p_sinlen, '" is ', lv_strlen .
+    CONCATENATE 'Length of string "' p_sinlen '" is: ' lv_strlen INTO lv_strlen .
+    WRITE : lv_strlen .
   ENDIF.
-
+**Reverse string
   IF lv_sb_active = 'S02' .
     lv_rev_res = reverse( p_sinrev ).
-    WRITE : 'Reverse of string "', p_sinrev, '" is ', lv_rev_res .
+    CONCATENATE 'Reverse of string "' p_sinrev '" is ' lv_rev_res into lv_rev_res .
+    WRITE : lv_rev_res .
+  ENDIF.
+**Shift string
+  IF lv_sb_active = 'S03' .
+    lv_sft_mod = p_sinsft.
+    DO p_sincnt TIMES.
+      SHIFT lv_sft_mod.
+    ENDDO.
+    lv_tempstr = p_sincnt .
+    CONCATENATE 'On Shifting "' p_sinsft '" ' lv_tempstr 'Times we get "' lv_sft_mod '"' INTO lv_sft_mod .
+    WRITE : lv_sft_mod .
+  ENDIF.
+**Condense String
+  IF lv_sb_active = 'S04' .
+    lv_cds_res = p_sinco .
+    IF p_sincg = 'X'.
+      CONDENSE lv_cds_res.
+    ELSEIF p_sincw = 'X'.
+      CONDENSE lv_cds_res NO-GAPS.
+    ENDIF.
+    CONCATENATE 'Condensed string "' p_sinco '" is "'  lv_cds_res '"' INTO lv_cds_res.
+    WRITE : lv_cds_res.
   ENDIF.

@@ -1,0 +1,128 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : Tempi
+*&  DEPT        : Materials
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 27TH JULY 2025
+*&  END DATE    : 27TH JULY 2025
+*&  PURPOSE     : Application demonstrating different apporaches
+*&                for declaring Internal Tables for ekko table
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+
+
+REPORT ymr_itab_decl NO STANDARD PAGE HEADING.
+
+
+
+
+***1ST
+***refering directly to type for both declation if work area and internal table
+*
+*TYPES ty_ekpo TYPE TABLE OF ekpo.
+*DATA : wa_ekpo TYPE LINE OF ty_ekpo,
+*       it_ekpo TYPE ty_ekpo.
+*
+
+***2nd
+*TYPES BEGIN OF ty_ekpo.
+*        INCLUDE STRUCTURE ekpo.
+*TYPES END OF ty_ekpo.
+*
+DATA : lv_ekpo_rec TYPE i .
+*DATA : lv_ekpo_rec TYPE i .
+*DATA : wa_ekpo TYPE ty_ekpo,
+*       it_ekpo TYPE TABLE OF ty_ekpo.
+
+
+****3rd
+TYPES : BEGIN OF ty_ekpo,
+          ebeln TYPE ekpo-ebeln,
+          matnr TYPE ekpo-matnr,
+          ktmng TYPE ekpo-ktmng,
+          menge TYPE ekpo-menge,
+          netpr TYPE ekpo-netpr,
+          netwr TYPE ekpo-netwr,
+        END OF ty_ekpo.
+
+DATA : wa_ekpo TYPE ty_ekpo,
+       it_ekpo LIKE TABLE OF wa_ekpo.
+**       it_ekpo type table of ty_ekpo.
+
+
+*DATA : wa_ekpo TYPE ty_ekpo,
+*       it_ekpo LIKE TABLE OF ty_ekpo.
+
+*DATA : it_ekpo TYPE TABLE OF ty_ekpo,
+*       wa_ekpo LIKE LINE OF it_ekpo.
+
+*DATA : BEGIN OF wa_ekpo.
+*        INCLUDE STRUCTURE ekpo.
+*DATA END  OF wa_ekpo.
+*
+*DATA : it_ekpo like TABLE OF wa_ekpo.
+
+
+
+***screen design
+SELECT-OPTIONS s_ebeln FOR wa_ekpo-ebeln.
+
+START-OF-SELECTION.
+
+**fetch sales item data
+  SELECT
+        ebeln
+        matnr
+        ktmng
+        menge
+        netpr
+        netwr
+     FROM ekpo
+            INTO CORRESPONDING FIELDS OF TABLE it_ekpo
+            WHERE ebeln IN s_ebeln .
+
+*SELECT * FROM ekpo
+*          INTO TABLE it_ekpo
+*          WHERE ebeln IN s_ebeln.
+
+  IF sy-subrc = 0.
+***check no. of records
+    DESCRIBE TABLE it_ekpo LINES lv_ekpo_rec.
+    CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+      EXPORTING
+*       i_callback_program = sy-cprog
+        i_callback_program = 'YMR_ITAB_DECL'
+        i_structure_name   = 'ekpo'
+      TABLES
+        t_outtab           = it_ekpo
+      EXCEPTIONS
+        program_error      = 1
+        OTHERS             = 2.
+
+
+****display sales item data
+**  LOOP AT it_ekpo INTO wa_ekpo.
+**    WRITE :/ wa_ekpo-ebeln,
+**             wa_ekpo-matnr,
+**             wa_ekpo-ktmng,
+**             wa_ekpo-menge,
+**             wa_ekpo-netpr,
+**             wa_ekpo-netwr,
+**    CLEAR wa_ekpo.
+**  ENDLOOP.
+**  SKIP.
+**  ULINE.
+**  WRITE :/ text-001 COLOR 5, lv_ekpo_rec COLOR 5.
+
+  ELSE.
+    MESSAGE w003(zsd_msg_cl).
+  ENDIF.

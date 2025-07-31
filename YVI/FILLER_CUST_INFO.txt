@@ -1,0 +1,19 @@
+INCLUDE yvi_decl_cust_info .
+
+***define macro to fill customer data manually
+DEFINE fill_cust_info.
+
+  WA_KNA1-KUNNR = &1.
+  WA_KNA1-NAME1 = &2.
+  WA_KNA1-SORTL = &3.
+  WA_KNA1-TELF1 = &4.
+  WA_KNA1-ORT01 = &5.
+  WA_KNA1-REGIO = &6.
+  WA_KNA1-LAND1 = &7.
+  WA_KNA1-STRAS = &8.
+  WA_KNA1-PSTLZ = &9.
+*  WA_KNA1-KTOKD = &10.
+  APPEND WA_KNA1 TO IT_KNA1.
+  CLEAR WA_KNA1.
+
+END-OF-DEFINITION.

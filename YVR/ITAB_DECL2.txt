@@ -1,0 +1,381 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : HP
+*&  DEPT        : SD
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Delivery
+*&  START DATE  : 27th JULY 2025
+*&  END DATE    : 27th JULY 2025
+*&  PURPOSE     : Application using rest of Itab declaration approaches.
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_itab_decl2 NO STANDARD PAGE HEADING.
+
+
+
+****14Th Approach without up to 1 rows
+
+TABLES vbap.
+
+PARAMETERS : p_vbeln TYPE vbap-vbeln OBLIGATORY .
+PARAMETERS : p_posnr TYPE vbap-posnr OBLIGATORY .
+
+SELECT *
+    FROM vbap
+    WHERE vbeln = p_vbeln
+    AND posnr = p_posnr.
+
+  WRITE :/ vbap-vbeln,
+           vbap-posnr,
+           vbap-matnr,
+           vbap-kwmeng,
+           vbap-meins,
+           vbap-netpr,
+           vbap-netwr,
+           vbap-waerk.
+
+ENDSELECT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+******14Th Approach without up to 1 rows
+**
+**TYPES : BEGIN OF ty_vbap,
+**          vbeln  TYPE vbap-vbeln,
+**          posnr  TYPE vbap-posnr,
+**          matnr  TYPE vbap-matnr,
+**          kwmeng TYPE vbap-kwmeng,
+**          meins  TYPE vbap-meins,
+**          netpr  TYPE vbap-netpr,
+**          netwr  TYPE vbap-netwr,
+**          waerk  TYPE vbap-waerk,
+**        END OF ty_vbap.
+**
+**DATA: wa_vbap    TYPE ty_vbap,
+**      lv_rec_cnt TYPE i.
+**
+**
+**PARAMETERS p_vbeln type ty_vbap-vbeln OBLIGATORY .
+**
+**SELECT
+**  vbeln
+**  posnr
+**  matnr
+**  kwmeng
+**  meins
+**  netpr
+**  netwr
+**  waerk
+**    FROM vbap
+**    INTO wa_vbap
+**    WHERE vbeln = p_vbeln.
+**ENDSELECT.
+**
+**IF sy-subrc = 0 .
+**  WRITE :/ wa_vbap-vbeln,
+**           wa_vbap-posnr,
+**           wa_vbap-matnr,
+**           wa_vbap-kwmeng,
+**           wa_vbap-meins,
+**           wa_vbap-netpr,
+**           wa_vbap-netwr,
+**           wa_vbap-waerk.
+**ENDIF.
+**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+******14Th Approach
+***
+***TYPES : BEGIN OF ty_vbap,
+***          vbeln  TYPE vbap-vbeln,
+***          posnr  TYPE vbap-posnr,
+***          matnr  TYPE vbap-matnr,
+***          kwmeng TYPE vbap-kwmeng,
+***          meins  TYPE vbap-meins,
+***          netpr  TYPE vbap-netpr,
+***          netwr  TYPE vbap-netwr,
+***          waerk  TYPE vbap-waerk,
+***        END OF ty_vbap.
+***
+***DATA: wa_vbap    TYPE ty_vbap,
+***      lv_rec_cnt TYPE i.
+***
+***
+***SELECT-OPTIONS s_vbeln FOR wa_vbap-vbeln .
+***
+***SELECT
+***  vbeln
+***  posnr
+***  matnr
+***  kwmeng
+***  meins
+***  netpr
+***  netwr
+***  waerk
+***    FROM vbap UP TO 1 ROWS
+***    INTO wa_vbap
+***    WHERE vbeln IN s_vbeln.
+***ENDSELECT.
+***
+***IF sy-subrc = 0 .
+***  WRITE :/ wa_vbap-vbeln,
+***           wa_vbap-posnr,
+***           wa_vbap-matnr,
+***           wa_vbap-kwmeng,
+***           wa_vbap-meins,
+***           wa_vbap-netpr,
+***           wa_vbap-netwr,
+***           wa_vbap-waerk.
+***ENDIF.
+
+
+*****13Th Approach
+**
+**TYPES : BEGIN OF ty_vbap,
+**          vbeln  TYPE vbap-vbeln,
+**          posnr  TYPE vbap-posnr,
+**          matnr  TYPE vbap-matnr,
+**          kwmeng TYPE vbap-kwmeng,
+**          meins  TYPE vbap-meins,
+**          netpr  TYPE vbap-netpr,
+**          netwr  TYPE vbap-netwr,
+**          waerk  TYPE vbap-waerk,
+**        END OF ty_vbap.
+**
+**DATA: wa_vbap    TYPE ty_vbap,
+**      lv_rec_cnt TYPE i.
+**
+**
+**SELECT-OPTIONS s_vbeln FOR wa_vbap-vbeln .
+**
+**SELECT SINGLE
+**  vbeln
+**  posnr
+**  matnr
+**  kwmeng
+**  meins
+**  netpr
+**  netwr
+**  waerk
+**    FROM vbap
+**  INTO wa_vbap
+**  WHERE vbeln IN s_vbeln.
+**
+**
+**IF sy-subrc = 0 .
+**    WRITE :/ wa_vbap-vbeln,
+**             wa_vbap-posnr,
+**             wa_vbap-matnr,
+**             wa_vbap-kwmeng,
+**             wa_vbap-meins,
+**             wa_vbap-netpr,
+**             wa_vbap-netwr,
+**             wa_vbap-waerk.
+**ENDIF.
+
+
+
+
+
+******11Th Approach
+**
+**TYPES : ty_vbap TYPE TABLE OF vbap.
+**
+**
+**DATA: zvbap      TYPE ty_vbap WITH HEADER LINE,
+**      lv_rec_cnt TYPE i.
+**
+**
+**SELECT-OPTIONS s_vbeln FOR zvbap-vbeln .
+**
+**SELECT * FROM vbap
+**  INTO TABLE zvbap[]
+**  WHERE vbeln IN s_vbeln.
+**
+**
+**IF sy-subrc = 0 .
+**
+**  DESCRIBE TABLE zvbap[] LINES lv_rec_cnt .
+**
+**  WRITE : / text-cnt COLOR 5, lv_rec_cnt COLOR 5.
+**  SKIP.
+**  LOOP AT zvbap.
+**    WRITE :/ zvbap-vbeln,
+**             zvbap-posnr,
+**             zvbap-matnr,
+**             zvbap-kwmeng,
+**             zvbap-meins,
+**             zvbap-netpr,
+**             zvbap-netwr,
+**             zvbap-waerk.
+**  ENDLOOP.
+**ENDIF.
+**
+
+
+
+**
+******10Th Approach
+**
+**TYPES : BEGIN OF ty_vbap,
+**          vbeln  TYPE vbap-vbeln,
+**          posnr  TYPE vbap-posnr,
+**          matnr  TYPE vbap-matnr,
+**          kwmeng TYPE vbap-kwmeng,
+**          meins  TYPE vbap-meins,
+**          netpr  TYPE vbap-netpr,
+**          netwr  TYPE vbap-netwr,
+**          waerk  TYPE vbap-waerk,
+**        END OF ty_vbap.
+**
+**DATA: zvbap      TYPE TABLE OF ty_vbap WITH HEADER LINE INITIAL SIZE 0,
+**      lv_rec_cnt TYPE i.
+**
+**
+**SELECT-OPTIONS s_vbeln FOR zvbap-vbeln .
+**
+**SELECT
+**  vbeln
+**  posnr
+**  matnr
+**  kwmeng
+**  meins
+**  netpr
+**  netwr
+**  waerk
+**    FROM vbap
+**  INTO TABLE zvbap[]
+**  WHERE vbeln IN s_vbeln.
+**
+**
+**DESCRIBE TABLE zvbap LINES lv_rec_cnt .
+**
+**write : / text-cnt color 5, lv_rec_cnt color 5.
+**
+**IF sy-subrc = 0 .
+**  LOOP AT zvbap.
+**    WRITE :/ zvbap-vbeln,
+**             zvbap-posnr,
+**             zvbap-matnr,
+**             zvbap-kwmeng,
+**             zvbap-meins,
+**             zvbap-netpr,
+**             zvbap-netwr,
+**             zvbap-waerk.
+**  ENDLOOP.
+**ENDIF.
+**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****
+********7Th Approach
+****
+****DATA : BEGIN OF zvbap OCCURS 0,
+****         vbeln  TYPE vbap-vbeln,
+****         posnr  TYPE vbap-posnr,
+****         matnr  TYPE vbap-matnr,
+****         kwmeng TYPE vbap-kwmeng,
+****         meins  TYPE vbap-meins,
+****         netpr  TYPE vbap-netpr,
+****         netwr  TYPE vbap-netwr,
+****         waerk  TYPE vbap-waerk,
+****       END OF zvbap,
+****       lv_rec_cnt TYPE i.
+****
+****
+****SELECT-OPTIONS s_vbeln FOR zvbap-vbeln .
+****
+****SELECT
+****  vbeln
+****  posnr
+****  matnr
+****  kwmeng
+****  meins
+****  netpr
+****  netwr
+****  waerk
+****    FROM vbap
+****  INTO TABLE zvbap[]
+****  WHERE vbeln IN s_vbeln.
+****
+****
+****DESCRIBE TABLE zvbap LINES lv_rec_cnt .
+****
+****IF sy-subrc = 0 .
+****  LOOP AT zvbap.
+****    WRITE :/ zvbap-vbeln,
+****             zvbap-posnr,
+****             zvbap-matnr,
+****             zvbap-kwmeng,
+****             zvbap-meins,
+****             zvbap-netpr,
+****             zvbap-netwr,
+****             zvbap-waerk.
+****  ENDLOOP.
+****ENDIF.

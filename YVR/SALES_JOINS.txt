@@ -1,0 +1,225 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad`
+*&  CLIENT      : CE
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 28TH JULY 2025
+*&  END DATE    : 28TH JULY 2025
+*&  PURPOSE     : An application to get data accross 3 different sales
+*&                tables using joins
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_sales_joins NO STANDARD PAGE HEADING LINE-SIZE 540.
+
+
+
+**********************************************************************
+**Inner Join on KNA1 AND KNB1
+
+**Decl
+TYPES : BEGIN OF ty_sales,
+          kunnr  TYPE kna1-kunnr,
+          name1  TYPE kna1-name1,
+          sortl  TYPE kna1-sortl,
+          telf1  TYPE kna1-telf1,
+          ort01  TYPE kna1-ort01,
+          regio  TYPE kna1-regio,
+          land1  TYPE kna1-land1,
+          spras  TYPE kna1-spras,
+          ktokd  TYPE kna1-ktokd,
+
+          vbeln  TYPE vbak-vbeln,
+          ernam  TYPE vbak-ernam,
+          erdat  TYPE vbak-erdat,
+          vbtyp  TYPE vbak-vbtyp,
+          auart  TYPE vbak-auart,
+          netwr  TYPE vbak-netwr,
+          waerk  TYPE vbak-waerk,
+
+          posnr  TYPE vbap-posnr,
+          matnr  TYPE vbap-matnr,
+          kwmeng TYPE vbap-kwmeng,
+          meins  TYPE vbap-meins,
+          netpr  TYPE vbap-netpr,
+          netwri TYPE vbap-netwr,
+          waerki TYPE vbap-waerk,
+        END OF ty_sales.
+
+FIELD-SYMBOLS <fs_sales> TYPE ty_sales.
+
+DATA : it_injoin TYPE TABLE OF ty_sales WITH HEADER LINE,
+       it_lojoin TYPE TABLE OF ty_sales WITH HEADER LINE,
+       lv_cnt    TYPE i.
+
+
+SELECT-OPTIONS s_kunnr FOR it_injoin-kunnr DEFAULT 1 TO 10 .
+
+
+SELECT
+  *
+        INTO CORRESPONDING FIELDS OF TABLE it_injoin
+        FROM kna1
+        INNER JOIN knb1
+        ON kna1~kunnr = knb1~kunnr
+        WHERE kna1~kunnr IN s_kunnr.
+
+SELECT
+ *
+        INTO CORRESPONDING FIELDS OF TABLE it_lojoin
+        FROM kna1 AS a1
+        LEFT OUTER JOIN vbak AS ak
+        ON a1~kunnr = ak~kunnr
+        WHERE a1~kunnr IN s_kunnr.
+
+
+IF sy-subrc <> 0.
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
+
+
+DESCRIBE TABLE it_injoin LINES lv_cnt.
+
+WRITE : / text-ijn , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP 2.
+ULINE.
+
+WRITE : text-001 ,          sy-vline,
+        text-002 ,          sy-vline,
+        text-003 ,          sy-vline,
+        text-004 ,          sy-vline,
+        text-005 ,          sy-vline,
+        text-006 ,          sy-vline,
+        text-007 ,          sy-vline,
+        text-008 ,          sy-vline,
+        text-009 ,          sy-vline,
+                            sy-vline,
+        text-010 ,          sy-vline,
+        text-011 ,          sy-vline,
+        text-012 ,          sy-vline,
+        text-013 ,          sy-vline,
+        text-014 ,          sy-vline,
+        text-015 ,          sy-vline,
+        text-016 ,          sy-vline,
+                            sy-vline,
+        text-017 ,          sy-vline,
+        text-018 ,          sy-vline,
+        text-019 ,          sy-vline,
+        text-020 ,          sy-vline,
+        text-021 ,          sy-vline,
+        text-022 ,          sy-vline,
+        text-023 ,          sy-vline.
+
+
+ULINE.
+
+
+LOOP AT it_injoin ASSIGNING <fs_sales>.
+  WRITE :  sy-vline,
+           <fs_sales>-kunnr  COLOR 5 UNDER text-001 ,
+           <fs_sales>-name1  COLOR 5 UNDER text-002 ,
+           <fs_sales>-sortl  COLOR 5 UNDER text-003 ,
+           <fs_sales>-telf1  COLOR 5 UNDER text-004 ,
+           <fs_sales>-ort01  COLOR 5 UNDER text-005 ,
+           <fs_sales>-regio  COLOR 5 UNDER text-006 ,
+           <fs_sales>-land1  COLOR 5 UNDER text-007 ,
+           <fs_sales>-spras  COLOR 5 UNDER text-008 ,
+           <fs_sales>-ktokd  COLOR 5 UNDER text-009 ,
+
+           <fs_sales>-vbeln  COLOR 6 UNDER text-010 ,
+           <fs_sales>-ernam  COLOR 6 UNDER text-011 ,
+           <fs_sales>-erdat  COLOR 6 UNDER text-012 ,
+           <fs_sales>-vbtyp  COLOR 6 UNDER text-013 ,
+           <fs_sales>-auart  COLOR 6 UNDER text-014 ,
+           <fs_sales>-netwr  COLOR 6 UNDER text-015 ,
+           <fs_sales>-waerk  COLOR 6 UNDER text-016 ,
+
+           <fs_sales>-posnr  COLOR 7 UNDER text-017 ,
+           <fs_sales>-matnr  COLOR 7 UNDER text-018 ,
+           <fs_sales>-kwmeng COLOR 7 UNDER text-019 ,
+           <fs_sales>-meins  COLOR 7 UNDER text-020 ,
+           <fs_sales>-netpr  COLOR 7 UNDER text-021 ,
+           <fs_sales>-netwri COLOR 7 UNDER text-022 ,
+           <fs_sales>-waerki COLOR 7 UNDER text-023 ,
+           AT sy-linsz sy-vline .
+  ULINE.
+ENDLOOP.
+
+
+SKIP 2.
+
+DESCRIBE TABLE it_lojoin LINES lv_cnt.
+
+WRITE : / text-ojn , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP.
+ULINE.
+
+WRITE : text-001 ,          sy-vline,
+        text-002 ,          sy-vline,
+        text-003 ,          sy-vline,
+        text-004 ,          sy-vline,
+        text-005 ,          sy-vline,
+        text-006 ,          sy-vline,
+        text-007 ,          sy-vline,
+        text-008 ,          sy-vline,
+        text-009 ,          sy-vline,
+                            sy-vline,
+        text-010 ,          sy-vline,
+        text-011 ,          sy-vline,
+        text-012 ,          sy-vline,
+        text-013 ,          sy-vline,
+        text-014 ,          sy-vline,
+        text-015 ,          sy-vline,
+        text-016 ,          sy-vline,
+                            sy-vline,
+        text-017 ,          sy-vline,
+        text-018 ,          sy-vline,
+        text-019 ,          sy-vline,
+        text-020 ,          sy-vline,
+        text-021 ,          sy-vline,
+        text-022 ,          sy-vline,
+        text-023 ,          sy-vline.
+
+
+ULINE.
+
+
+LOOP AT it_lojoin ASSIGNING <fs_sales>.
+  WRITE :  sy-vline,
+           <fs_sales>-kunnr  COLOR 5 UNDER text-001 ,
+           <fs_sales>-name1  COLOR 5 UNDER text-002 ,
+           <fs_sales>-sortl  COLOR 5 UNDER text-003 ,
+           <fs_sales>-telf1  COLOR 5 UNDER text-004 ,
+           <fs_sales>-ort01  COLOR 5 UNDER text-005 ,
+           <fs_sales>-regio  COLOR 5 UNDER text-006 ,
+           <fs_sales>-land1  COLOR 5 UNDER text-007 ,
+           <fs_sales>-spras  COLOR 5 UNDER text-008 ,
+           <fs_sales>-ktokd  COLOR 5 UNDER text-009 ,
+
+           <fs_sales>-vbeln  COLOR 6 UNDER text-010 ,
+           <fs_sales>-ernam  COLOR 6 UNDER text-011 ,
+           <fs_sales>-erdat  COLOR 6 UNDER text-012 ,
+           <fs_sales>-vbtyp  COLOR 6 UNDER text-013 ,
+           <fs_sales>-auart  COLOR 6 UNDER text-014 ,
+           <fs_sales>-netwr  COLOR 6 UNDER text-015 ,
+           <fs_sales>-waerk  COLOR 6 UNDER text-016 ,
+
+           <fs_sales>-posnr  COLOR 7 UNDER text-017 ,
+           <fs_sales>-matnr  COLOR 7 UNDER text-018 ,
+           <fs_sales>-kwmeng COLOR 7 UNDER text-019 ,
+           <fs_sales>-meins  COLOR 7 UNDER text-020 ,
+           <fs_sales>-netpr  COLOR 7 UNDER text-021 ,
+           <fs_sales>-netwri COLOR 7 UNDER text-022 ,
+           <fs_sales>-waerki COLOR 7 UNDER text-023 ,
+           AT sy-linsz sy-vline .
+  ULINE.
+ENDLOOP.

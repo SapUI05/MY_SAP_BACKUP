@@ -1,0 +1,156 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : HP
+*&  DEPT        : Materials
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Logistics
+*&  START DATE  : 20TH JULY 2025
+*&  END DATE    : 20TH JULY 2025
+*&  PURPOSE     : Application to fetch and display vendor data using
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_cust_data_structure NO STANDARD PAGE HEADING LINE-SIZE 210.
+
+**Declaration
+DATA : BEGIN OF wa_lfa1,
+         lifnr         TYPE lfa1-lifnr,
+         name1         TYPE lfa1-name1,
+         ort01         TYPE lfa1-ort01,
+         land1         TYPE lfa1-land1,
+         spras         TYPE lfa1-spras,
+         j_sc_currency TYPE lfa1-j_sc_currency,
+         ktokk         TYPE lfa1-ktokk,
+       END OF wa_lfa1,
+       it_lfa1      LIKE TABLE OF wa_lfa1,
+       lv_rec_cnt   TYPE i,
+       lv_rec_len   TYPE i,
+       lv_str_len   TYPE i,
+       lv_len1      TYPE i,
+       lv_len2      TYPE i,
+       lv_len3      TYPE i,
+       lv_len4      TYPE i,
+       lv_len5      TYPE i,
+       lv_len6      TYPE i,
+       lv_line_size TYPE i,
+       lv_padper    TYPE f VALUE '1.42'.
+
+**Screen Design
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-0mn.
+SELECT-OPTIONS : s_lifnr  for wa_lfa1-lifnr,
+                 s_ort01  FOR wa_lfa1-ort01,
+                 s_land1  FOR wa_lfa1-land1,
+                 s_spras  FOR wa_lfa1-spras,
+                 s_curecy FOR wa_lfa1-j_sc_currency,
+                 s_name1  FOR wa_lfa1-name1 NO INTERVALS,
+                 s_ktokk  FOR wa_lfa1-ktokk NO-EXTENSION NO INTERVALS.
+SELECTION-SCREEN END   OF BLOCK inp.
+
+**fetch customer data
+SELECT  lifnr
+        name1
+        ort01
+        land1
+        spras
+        j_sc_currency
+        ktokk
+  FROM lfa1 INTO
+  CORRESPONDING FIELDS OF
+  TABLE it_lfa1
+  WHERE
+    lifnr in s_lifnr AND
+    name1 IN s_name1 AND
+    ort01 IN s_ort01 AND
+    land1 IN s_land1 AND
+    spras IN s_spras AND
+    j_sc_currency IN s_curecy AND
+    ktokk IN s_ktokk.
+
+
+DESCRIBE FIELD wa_lfa1-lifnr          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-002 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len1 =   lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-name1          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-003 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len2 = lv_len1 + lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-ort01          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-004 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len3 = lv_len2 + lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-land1          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-005 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len4 = lv_len3 + lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-spras          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-006 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len5 = lv_len4 + lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-j_sc_currency  LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-007 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_len6 = lv_len5 + lv_padper * lv_rec_len .
+
+DESCRIBE FIELD wa_lfa1-ktokk          LENGTH lv_rec_len IN CHARACTER MODE.
+lv_str_len = strlen( text-008 ) .
+IF lv_str_len > lv_rec_len. lv_rec_len = lv_str_len . ENDIF.
+lv_line_size = lv_len6 + lv_padper * lv_rec_len .
+
+*WRITE lv_line_size .
+*WRITE : / 'lv_len1:',  lv_len1,
+*        / 'lv_len2:',  lv_len2,
+*        / 'lv_len3:',  lv_len3,
+*        / 'lv_len4:',  lv_len4,
+*        / 'lv_len5:',  lv_len5,
+*        / 'lv_len6:',  lv_len6.
+
+IF sy-subrc = 0.
+
+**Get No of records
+  DESCRIBE TABLE it_lfa1 LINES lv_rec_cnt.
+
+  WRITE :/ lv_rec_cnt COLOR 5, text-001 COLOR 2 .
+
+  SKIP.
+**Column Headings
+  WRITE :   AT /1(lv_line_size) sy-uline,
+            /1         sy-vline, text-002   COLOR 4 INVERSE ON ,
+            AT lv_len1 sy-vline, text-003   COLOR 4 INVERSE ON ,
+            AT lv_len2 sy-vline, text-004   COLOR 4 INVERSE ON ,
+            AT lv_len3 sy-vline, text-005   COLOR 4 INVERSE ON ,
+            AT lv_len4 sy-vline, text-006   COLOR 4 INVERSE ON ,
+            AT lv_len5 sy-vline, text-007   COLOR 4 INVERSE ON ,
+            AT lv_len6 sy-vline, text-008   COLOR 4 INVERSE ON ,
+            AT lv_line_size sy-vline ,
+            AT /1(lv_line_size) sy-uline .
+
+**Looping internal table data
+  LOOP AT it_lfa1 INTO wa_lfa1.
+**Writing Indivudal rows from workarea
+    WRITE :     /1      sy-vline, wa_lfa1-lifnr         UNDER  text-002 ,
+             AT lv_len1 sy-vline, wa_lfa1-name1         UNDER  text-003 ,
+             AT lv_len2 sy-vline, wa_lfa1-ort01         UNDER  text-004 ,
+             AT lv_len3 sy-vline, wa_lfa1-land1         UNDER  text-005 ,
+             AT lv_len4 sy-vline, wa_lfa1-spras         UNDER  text-006 ,
+             AT lv_len5 sy-vline, wa_lfa1-j_sc_currency UNDER  text-007 ,
+             AT lv_len6 sy-vline, wa_lfa1-ktokk         UNDER  text-008 ,
+             AT lv_line_size sy-vline ,
+             AT /1(lv_line_size) sy-uline .
+  ENDLOOP.
+ELSE.
+**Dispaying Error, if any
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.

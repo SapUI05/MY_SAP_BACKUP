@@ -1,0 +1,26 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : TCI
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 30TH JULY 2025
+*&  END DATE    : 30TH JULY 2025
+*&  PURPOSE     : Application to use include to fill and display customer info
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvi_cust_info_include .
+
+
+INCLUDE yvi_filling_cust_info .
+
+
+INCLUDE yvi_display_cust_info .

@@ -1,0 +1,138 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad`
+*&  CLIENT      : CE
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Distribution
+*&  START DATE  : 28TH JULY 2025
+*&  END DATE    : 28TH JULY 2025
+*&  PURPOSE     : An application to get data accross different sales
+*&                tables using joins
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_customer_fae NO STANDARD PAGE HEADING LINE-SIZE 187.
+
+
+
+**********************************************************************
+**Dec two tables
+TYPES : BEGIN OF ty_kna1,
+          kunnr TYPE kna1-kunnr,
+          name1 TYPE kna1-name1,
+          sortl TYPE kna1-sortl,
+          telf1 TYPE kna1-telf1,
+          ort01 TYPE kna1-ort01,
+          regio TYPE kna1-regio,
+          land1 TYPE kna1-land1,
+          spras TYPE kna1-spras,
+          ktokd TYPE kna1-ktokd,
+        END   OF ty_kna1,
+        BEGIN OF ty_knb1,
+          kunnr1 TYPE kna1-kunnr,
+          bukrs  TYPE knb1-bukrs,
+          pernr  TYPE knb1-pernr,
+          akont  TYPE knb1-akont,
+          begru  TYPE knb1-begru,
+          ernam  TYPE knb1-ernam,
+          erdat  TYPE knb1-erdat,
+        END OF ty_knb1.
+
+
+DATA : it_kna1 TYPE TABLE OF ty_kna1 WITH HEADER LINE,
+       it_knb1 TYPE TABLE OF ty_knb1 WITH HEADER LINE,
+       lv_cnt  TYPE i.
+
+TYPES : BEGIN OF ty_join.
+        INCLUDE STRUCTURE : it_kna1, it_knb1 .
+TYPES : END OF ty_join.
+
+FIELD-SYMBOLS : <fs_join> TYPE ty_join,
+                <fs_kna1> TYPE ty_kna1,
+                <fs_knb1> TYPE ty_knb1.
+
+DATA :  it_join TYPE TABLE OF ty_join WITH HEADER LINE,
+        wa_join TYPE ty_join.
+
+SELECT-OPTIONS : s_kunnr FOR it_join-kunnr DEFAULT 1 TO 10 .
+
+
+SELECT
+      kunnr
+      name1
+      sortl
+      telf1
+      ort01
+      regio
+      land1
+      spras
+      ktokd
+            INTO TABLE it_kna1
+            FROM kna1
+            WHERE kna1~kunnr IN s_kunnr.
+
+
+IF sy-subrc <> 0 .
+  MESSAGE 'KNA1 Table has no records for current selection' TYPE 'E' DISPLAY LIKE 'S' .
+ENDIF.
+
+SELECT
+      kunnr
+      bukrs
+      pernr
+      akont
+      begru
+      ernam
+      erdat
+            INTO TABLE it_knb1
+            FROM knb1
+            FOR ALL ENTRIES IN it_kna1
+            WHERE kunnr = it_kna1-kunnr.
+
+
+IF sy-subrc <> 0 .
+  MESSAGE 'KNB1 Table has no matching records for current selection' TYPE 'E' DISPLAY LIKE 'S' .
+ENDIF.
+
+LOOP AT it_knb1 ASSIGNING <fs_knb1>.
+  CLEAR wa_join.
+  MOVE-CORRESPONDING <fs_knb1> TO wa_join.
+  READ TABLE it_kna1 ASSIGNING <fs_kna1> WITH KEY kunnr = <fs_knb1>-kunnr1 .
+  MOVE-CORRESPONDING <fs_kna1> TO wa_join.
+  APPEND wa_join TO it_join.
+ENDLOOP.
+
+DESCRIBE TABLE it_join LINES lv_cnt.
+
+WRITE : / text-fae , / text-cnt COLOR 4 , lv_cnt COLOR 4 .
+
+SKIP.
+ULINE.
+
+LOOP AT it_join ASSIGNING <fs_join>.
+  WRITE :  sy-vline,
+           <fs_join>-kunnr COLOR 5 ,
+           <fs_join>-name1 COLOR 5 ,
+           <fs_join>-sortl COLOR 5 ,
+           <fs_join>-telf1 COLOR 5 ,
+           <fs_join>-ort01 COLOR 5 ,
+           <fs_join>-regio COLOR 5 ,
+           <fs_join>-land1 COLOR 5 ,
+           <fs_join>-spras COLOR 5 ,
+           <fs_join>-ktokd COLOR 5 ,
+           sy-vline,
+           <fs_join>-bukrs COLOR 6 ,
+           <fs_join>-pernr COLOR 6 ,
+           <fs_join>-akont COLOR 6 ,
+           <fs_join>-begru COLOR 6 ,
+           <fs_join>-ernam COLOR 6 ,
+           <fs_join>-erdat COLOR 6 ,
+           187 sy-vline .
+  ULINE.
+ENDLOOP.

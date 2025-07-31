@@ -1,0 +1,44 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : BAJAJ
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Invoices
+*&  START DATE  : 30TH JULY 2025
+*&  END DATE    : 30TH JULY 2025
+*&  PURPOSE     : Application using sub routines to display customer info
+*&                from DB based on user selection
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_cust_info_subr NO STANDARD PAGE HEADING.
+
+**Basic Declaration
+INCLUDE yvi_cust_info_subr_decl.
+
+**Selection Screen
+INCLUDE yvi_cust_info_sr_sel_scr.
+**Define Fetching Info
+INCLUDE yvi_cust_info_fetch.
+
+START-OF-SELECTION.
+
+**Fetching Info
+PERFORM fetch_cust_info TABLES   s_kunnr
+                                 s_land1
+                                 it_kna1
+                        USING    p_ktokd
+                        CHANGING lv_rec.
+
+**Displaying Info
+PERFORM display_cust_info.
+
+**Define Displaying Info
+*  INCLUDE yvi_cust_info_subr_display.

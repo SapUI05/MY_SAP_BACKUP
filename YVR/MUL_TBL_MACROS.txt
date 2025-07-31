@@ -1,0 +1,36 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : RIL
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 2025
+*&  END DATE    : 2025
+*&  PURPOSE     : Application to print multiplication table using macros
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yvr_mul_tbl_macros.
+
+
+PARAMETERS : p_for  TYPE i default 8,
+             p_till TYPE i default 10.
+data : lv_tmp type i.
+
+DEFINE print_mul.
+  WRITE : / &1 , 'X' , &2 , '=' , &3 .
+END-OF-DEFINITION.
+
+START-OF-SELECTION.
+
+  DO p_till TIMES.
+    lv_tmp = p_for * sy-index .
+    print_mul : p_for sy-index  lv_tmp .
+  ENDDO.

@@ -1,0 +1,68 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : ABC
+*&  DEPT        : HR
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 29TH JULY 2025
+*&  END DATE    : 29TH JULY 2025
+*&  PURPOSE     : Application to lookup manager name
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+
+REPORT yhr_manager_lookup.
+
+*tables YHR_EMPLOYEE .
+
+TYPES: BEGIN OF ty_emp,
+          empid    TYPE n LENGTH 4,
+          name     TYPE string,
+          salary   TYPE p DECIMALS 2,
+          currency TYPE string,
+          manager  TYPE n LENGTH 4,
+       END OF ty_emp,
+       BEGIN OF ty_res,
+         name   TYPE string,
+         mname  TYPE string,
+         mmname TYPE string,
+       END OF ty_res.
+
+DATA: it_emp TYPE STANDARD TABLE OF ty_emp WITH EMPTY KEY,
+      wa_res TYPE ty_res,
+      it_res TYPE TABLE OF ty_res.
+
+
+it_emp = VALUE #(
+  ( empid = '1001' name = 'Raheem' salary = '10000.00' currency = 'INR' manager = '1008' )
+  ( empid = '1002' name = 'Ram'    salary = '20000.00' currency = 'INR' manager = '1009' )
+  ( empid = '1003' name = 'Paul'   salary = '30000.00' currency = 'INR' manager = '1001' )
+  ( empid = '1004' name = 'John'   salary = '40000.00' currency = 'INR' manager = '1002' )
+  ( empid = '1005' name = 'Saleem' salary = '10000.00' currency = 'INR' manager = '1004' )
+  ( empid = '1006' name = 'Shawn'  salary = '20000.00' currency = 'INR' manager = '1001' )
+  ( empid = '1007' name = 'Bush'   salary = '30000.00' currency = 'INR' manager = '1009' )
+  ( empid = '1008' name = 'Obama'  salary = '40000.00' currency = 'INR' manager = '1001' )
+  ( empid = '1009' name = 'Pal'    salary = '10000.00' currency = 'INR' manager = '1010' )
+  ( empid = '1010' name = 'Sam'    salary = '20000.00' currency = 'INR' manager = '1011' )
+  ( empid = '1011' name = 'Spain'  salary = '30000.00' currency = 'INR' manager = '1001' )
+).
+
+*INSERT YHR_EMPLOYEE FROM TABLE it_emp.
+
+
+*SELECT
+*  a1~name
+*  b1~name
+*  c1~name
+*  from YH_MANAGER as a1
+*  INTO it_res
+*  join YH_MANAGER as b1
+*  where a1-manager = b1-empid
+*  join YH_MANAGER as c1
+*  where b1-manager = c1-empid.

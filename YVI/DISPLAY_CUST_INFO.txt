@@ -1,0 +1,13 @@
+***display customer data
+LOOP AT it_kna1 INTO wa_kna1.
+  WRITE :/ wa_kna1-kunnr,
+           wa_kna1-name1,
+           wa_kna1-sortl,
+           wa_kna1-telf1,
+           wa_kna1-ort01,
+           wa_kna1-regio,
+           wa_kna1-land1,
+           wa_kna1-stras,
+           wa_kna1-pstlz.
+  CLEAR wa_kna1.
+ENDLOOP.

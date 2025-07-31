@@ -1,0 +1,169 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad`
+*&  CLIENT      : CE
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : Distribution
+*&  START DATE  : 28TH JULY 2025
+*&  END DATE    : 28TH JULY 2025
+*&  PURPOSE     : An application to get data accross different sales
+*&                tables using joins
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_vendor_info_join NO STANDARD PAGE HEADING LINE-SIZE 190.
+
+
+
+**********************************************************************
+**Inner Join on KNA1 AND KNB1
+
+**Decl
+TYPES : BEGIN OF ty_join,
+          lifnr TYPE lfa1-lifnr,
+          name1 TYPE lfa1-name1,
+          sortl TYPE lfa1-sortl,
+          telf1 TYPE lfa1-telf1,
+          ort01 TYPE lfa1-ort01,
+          regio TYPE lfa1-regio,
+          land1 TYPE lfa1-land1,
+          spras TYPE lfa1-spras,
+          ktokk TYPE lfa1-ktokk,
+
+          bukrs TYPE lfb1-bukrs,
+          pernr TYPE lfb1-pernr,
+          akont TYPE lfb1-akont,
+          begru TYPE lfb1-begru,
+          ernam TYPE lfb1-ernam,
+          erdat TYPE lfb1-erdat,
+        END OF ty_join.
+
+FIELD-SYMBOLS <fs_join> TYPE ty_join.
+
+DATA : it_injoin TYPE TABLE OF ty_join WITH HEADER LINE,
+       it_lojoin TYPE TABLE OF ty_join WITH HEADER LINE,
+       lv_cnt    TYPE i.
+
+
+SELECT-OPTIONS s_lifnr FOR it_injoin-lifnr DEFAULT 50 TO 100 .
+
+
+SELECT
+  lfa1~lifnr
+  lfa1~name1
+  lfa1~sortl
+  lfa1~telf1
+  lfa1~ort01
+  lfa1~regio
+  lfa1~land1
+  lfa1~spras
+  lfa1~ktokk
+
+  lfb1~bukrs
+  lfb1~pernr
+  lfb1~akont
+  lfb1~begru
+  lfb1~ernam
+  lfb1~erdat
+        INTO TABLE it_injoin
+        FROM lfa1
+        INNER JOIN lfb1
+        ON lfa1~lifnr = lfb1~lifnr
+        WHERE lfa1~lifnr IN s_lifnr.
+
+SELECT
+  a1~lifnr
+  a1~name1
+  a1~sortl
+  a1~telf1
+  a1~ort01
+  a1~regio
+  a1~land1
+  a1~spras
+  a1~ktokk
+
+  b1~bukrs
+  b1~pernr
+  b1~akont
+  b1~begru
+  b1~ernam
+  b1~erdat
+        INTO TABLE it_lojoin
+        FROM lfa1 AS a1
+        LEFT OUTER JOIN lfb1 AS b1
+        ON a1~lifnr = b1~lifnr
+        WHERE a1~lifnr IN s_lifnr.
+
+
+IF sy-subrc <> 0.
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
+
+
+DESCRIBE TABLE it_injoin LINES lv_cnt.
+
+WRITE : / text-ijn , / text-cnt , lv_cnt .
+
+SKIP.
+ULINE.
+
+LOOP AT it_injoin ASSIGNING <fs_join>.
+  WRITE :  sy-vline,
+           <fs_join>-lifnr COLOR 5 INVERSE ON ,
+           <fs_join>-name1 COLOR 5 INVERSE ON ,
+           <fs_join>-sortl COLOR 5 INVERSE ON ,
+           <fs_join>-telf1 COLOR 5 INVERSE ON ,
+           <fs_join>-ort01 COLOR 5 INVERSE ON ,
+           <fs_join>-regio COLOR 5 INVERSE ON ,
+           <fs_join>-land1 COLOR 5 INVERSE ON ,
+           <fs_join>-spras COLOR 5 INVERSE ON ,
+           <fs_join>-ktokk COLOR 5 INVERSE ON ,
+           sy-vline,
+           <fs_join>-bukrs COLOR 4 INVERSE ON ,
+           <fs_join>-pernr COLOR 4 INVERSE ON ,
+           <fs_join>-akont COLOR 4 INVERSE ON ,
+           <fs_join>-begru COLOR 4 INVERSE ON ,
+           <fs_join>-ernam COLOR 4 INVERSE ON ,
+           <fs_join>-erdat COLOR 4 INVERSE ON ,
+           AT sy-linsz sy-vline .
+  ULINE.
+ENDLOOP.
+
+
+SKIP 2.
+
+DESCRIBE TABLE it_lojoin LINES lv_cnt.
+
+WRITE : / text-ojn , / text-cnt , lv_cnt .
+
+SKIP.
+ULINE.
+
+
+LOOP AT it_lojoin ASSIGNING <fs_join>.
+  WRITE : / sy-vline,
+            <fs_join>-lifnr COLOR 5 INVERSE ON ,
+            <fs_join>-name1 COLOR 5 INVERSE ON ,
+            <fs_join>-sortl COLOR 5 INVERSE ON ,
+            <fs_join>-telf1 COLOR 5 INVERSE ON ,
+            <fs_join>-ort01 COLOR 5 INVERSE ON ,
+            <fs_join>-regio COLOR 5 INVERSE ON ,
+            <fs_join>-land1 COLOR 5 INVERSE ON ,
+            <fs_join>-spras COLOR 5 INVERSE ON ,
+            <fs_join>-ktokk COLOR 5 INVERSE ON ,
+            sy-vline,
+            <fs_join>-bukrs COLOR 4 INVERSE ON ,
+            <fs_join>-pernr COLOR 4 INVERSE ON ,
+            <fs_join>-akont COLOR 4 INVERSE ON ,
+            <fs_join>-begru COLOR 4 INVERSE ON ,
+            <fs_join>-ernam COLOR 4 INVERSE ON ,
+            <fs_join>-erdat COLOR 4 INVERSE ON ,
+            AT sy-linsz sy-vline .
+  ULINE.
+ENDLOOP.

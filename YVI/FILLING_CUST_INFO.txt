@@ -1,0 +1,10 @@
+INCLUDE yvi_filler_cust_info.
+
+***call macro and pass data
+fill_cust_info : '1000' 'FIRDOUS' 'FI' '9848011111' 'HYDERABAD'   'TS' 'IN' '1-2-34, SHAIKPET'      '500008', " '0001',
+                 '2000' 'KABIR'   'KA' '9848022222' 'VIJAYAWADA'  'AP' 'IN' '2-3-45, SHIVAJI NAGAR' '500100', " '0002',
+                 '3000' 'IRFAN'   'IR' '9848033333' 'NIZAMABAD'   'TS' 'IN' '3-4056, MALLAPALLI'    '503001', " '0002',
+                 '4000' 'SAQLAIN' 'SA' '9848044444' 'VIZAG'       'AP' 'IN' '5-6-78, ABC COLONY'    '500099', " '0004',
+                 '5000' 'BHANU'   'BH' '9848055555' 'RAJAMUMDRY'  'AP' 'IN' '9-08-7, XYX NAGAR'     '500015', " '0001',
+                 '6000' 'ASHHAD'  'AS' '9848066666' 'BODHAN'      'TS' 'IN' '8-7-65, ACHANPALLY'    '503185', " '0002',
+                 '7000' 'MALIK'   'MA' '9848077777' 'NANDED'      'MH' 'IN' '1-2-34, DELOOR NAKA'   '200018'. " '0003'.

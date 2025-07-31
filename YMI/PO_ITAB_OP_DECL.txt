@@ -1,0 +1,58 @@
+************************************************************************
+**Declaration
+DATA : BEGIN OF wa_ekkov,
+         ebeln TYPE ekko-ebeln ,        "          Purchase Document Number
+         verkf TYPE ekko-verkf ,        "          SalesPerson responsable at Vendor Office
+       END  OF wa_ekkov,
+       it_ekkov LIKE TABLE OF wa_ekkov,
+
+       BEGIN OF wa_ekko,
+         ebeln TYPE ekko-ebeln ,        "          Purchase Document Number
+         aedat TYPE ekko-aedat ,        "          Created At
+         verkf TYPE ekko-verkf ,        "          SalesPerson responsable at Vendor Office
+         ktwrt TYPE ekko-ktwrt ,        "          Target Value - HA per Dist
+       END  OF wa_ekko,
+       wa_ekko_2     LIKE wa_ekko,
+
+       it_ekko       LIKE TABLE OF wa_ekko,
+       it_ekko_2     LIKE TABLE OF wa_ekko,
+       it_ekko_3     LIKE TABLE OF wa_ekko,
+
+       lv_ekko_cnt   TYPE i,
+       lv_ekko_cnt2  TYPE i,
+       lv_ekko_cnt3  TYPE i,
+       lv_ekkov_cnt  TYPE i,
+
+       lv_tmp        TYPE i,
+
+       lv_active_mn  TYPE screen-group1,
+       lv_active_sb  TYPE screen-group1,
+       lv_active_sb2 TYPE screen-group1,
+
+       lv_opt_show   TYPE i,
+
+       lv_tbl_wth    TYPE i,
+       lv_tbl_wth2   TYPE i,
+       lv_tbl_gap    TYPE i VALUE 8,
+       lv_line_strt  TYPE i,
+       lv_col_strt   TYPE i VALUE 5,
+       lv_col_end    TYPE i,
+
+       lv_ischecked  TYPE c VALUE 'X',
+
+       lv_showit1    TYPE c  VALUE 'X',
+       lv_showit2    TYPE c  VALUE 'X',
+       lv_showit3    TYPE c  VALUE 'X',
+       lv_showitv    TYPE c  VALUE 'X',
+       lv_showwa1    TYPE c  VALUE 'X',
+       lv_showwa2    TYPE c  VALUE 'X',
+       lv_showwav    TYPE c  VALUE 'X',
+       lv_showfso    TYPE c  VALUE 'X',
+       lv_showfsv    TYPE c  VALUE 'X',
+
+       lv_sort_sep   TYPE string VALUE 'Then By',
+       lv_sort_order TYPE string,
+       lv_tmp_string TYPE string.
+
+FIELD-SYMBOLS <fs_ekko>  LIKE wa_ekko .
+FIELD-SYMBOLS <fs_ekkov> LIKE wa_ekkov .

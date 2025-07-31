@@ -1,0 +1,578 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : VIVO
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 22ND JULY 2025
+*&  END DATE    : 22ND JULY 2025
+*&  PURPOSE     : Application to use internal table to load(fill) & move
+*&                customer data then display it
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_cust_itab_op NO STANDARD PAGE HEADING LINE-SIZE 230.
+**********************************************************************
+**Declaration
+DATA : BEGIN OF ls_vbakv,
+         vbeln TYPE vbak-vbeln,
+         ernam TYPE vbak-ernam,
+         erdat TYPE vbak-erdat,
+         vbtyp TYPE vbak-vbtyp,
+         auart TYPE vbak-auart,
+         netwr TYPE vbak-netwr,
+       END  OF ls_vbakv,
+       it_vbakv      LIKE TABLE OF ls_vbakv,
+
+       BEGIN OF ls_vbak,
+         vbeln TYPE vbak-vbeln,
+         ernam TYPE vbak-ernam,
+         erdat TYPE vbak-erdat,
+         vbtyp TYPE vbak-vbtyp,
+         auart TYPE vbak-auart,
+         kunnr TYPE vbak-kunnr,
+         netwr TYPE vbak-netwr,
+         waerk TYPE vbak-waerk,
+       END  OF ls_vbak,
+       ls_vbak_2    LIKE ls_vbak,
+
+       it_vbak      LIKE TABLE OF ls_vbak,
+       it_vbak_2    LIKE TABLE OF ls_vbak,
+       it_vbak_3    LIKE TABLE OF ls_vbak,
+
+       lv_vbak_cnt  TYPE i,
+       lv_vbak_cnt2 TYPE i,
+       lv_vbak_cnt3 TYPE i,
+       lv_vbakv_cnt TYPE i,
+
+       lv_tmp       TYPE i,
+
+       lv_active_mn TYPE screen-group1,
+       lv_active_sb TYPE screen-group1,
+
+       lv_opt_show  TYPE i,
+
+       lv_tbl_wth   TYPE i,
+       lv_tbl_wth2  TYPE i.
+**********************************************************************
+**Selection Screen - Value
+SELECTION-SCREEN BEGIN OF BLOCK inp WITH FRAME TITLE text-001 .
+SELECT-OPTIONS : s_vbeln FOR ls_vbak-vbeln MODIF ID rng.
+SELECTION-SCREEN END   OF BLOCK inp .
+**Selection Screen - Config
+SELECTION-SCREEN BEGIN OF BLOCK cnf WITH FRAME TITLE text-017 .
+**Space At Top
+SELECTION-SCREEN SKIP 2 .
+SELECTION-SCREEN COMMENT  1(30)  text-018 MODIF ID omn .
+**Operation Type
+PARAMETERS : p_tytran RADIOBUTTON GROUP typ MODIF ID omn USER-COMMAND optyp DEFAULT 'X',
+             p_tydele RADIOBUTTON GROUP typ MODIF ID omn.
+**Space Between
+SELECTION-SCREEN SKIP 2.
+**Transfer Operation Type
+SELECTION-SCREEN COMMENT  1(30)        text-trn MODIF ID trn .
+PARAMETERS : p_trnmnl RADIOBUTTON GROUP     trn MODIF ID trn USER-COMMAND optrn DEFAULT 'X',
+             p_trnapd RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnist RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnclt RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnmov RADIOBUTTON GROUP     trn MODIF ID trn,
+             p_trnmco RADIOBUTTON GROUP     trn MODIF ID trn.
+**Delete Operation Type
+**Space Between
+SELECTION-SCREEN SKIP .
+SELECTION-SCREEN COMMENT  1(30)        text-del MODIF ID del .
+PARAMETERS : p_delclr RADIOBUTTON GROUP     del MODIF ID del USER-COMMAND opdel DEFAULT 'X',
+             p_delrfh RADIOBUTTON GROUP     del MODIF ID del,
+             p_delfre RADIOBUTTON GROUP     del MODIF ID del.
+**Space Between
+SELECTION-SCREEN SKIP .
+**Text showing Manual transfer to process
+SELECTION-SCREEN COMMENT  1(79)  text-mnl MODIF ID mnl .
+**Space At Bottom
+SELECTION-SCREEN SKIP .
+**Append Operation Type
+SELECTION-SCREEN COMMENT  1(79)        text-apd MODIF ID apd .
+PARAMETERS : p_apdfrm TYPE i MODIF ID apd,
+             p_apd_to TYPE i MODIF ID apd.
+**Space At Bottom
+SELECTION-SCREEN SKIP .
+**Insert Operation Type
+SELECTION-SCREEN COMMENT  1(79)        text-ist MODIF ID ist .
+PARAMETERS : p_istind TYPE i MODIF ID ist OBLIGATORY DEFAULT 1,
+             p_istfrm TYPE i MODIF ID ist,
+             p_ist_to TYPE i MODIF ID ist.
+**Space Between
+SELECTION-SCREEN SKIP .
+**Collect Operation Type
+SELECTION-SCREEN COMMENT  1(79)        text-clt MODIF ID clt .
+PARAMETERS : p_clttim TYPE i MODIF ID clt OBLIGATORY DEFAULT 1 .
+**Space Between
+SELECTION-SCREEN SKIP .
+SELECTION-SCREEN END   OF BLOCK cnf .
+**********************************************************************
+**fetch records from db
+SELECT vbeln
+       ernam
+       erdat
+       vbtyp
+       auart
+       kunnr
+       netwr
+       waerk
+      INTO TABLE it_vbak
+      UP TO 5 ROWS
+      FROM vbak
+      WHERE vbeln IN s_vbeln.
+**********************************************************************
+**Display error in case of error
+IF sy-subrc <> 0.   MESSAGE e003(zsd_msg_cl). ENDIF.
+**********************************************************************
+**fetch records from db
+SELECT vbeln
+       ernam
+       erdat
+       vbtyp
+       auart
+       kunnr
+       netwr
+       waerk
+      INTO TABLE it_vbak_2
+      UP TO 15 ROWS
+      FROM vbak
+      WHERE vbeln IN s_vbeln
+      ORDER BY netwr DESCENDING.
+**********************************************************************
+**Display error in case of error
+IF sy-subrc <> 0.  MESSAGE e003(zsd_msg_cl). ENDIF.
+**********************************************************************
+*skip first 5 records in internal table 2
+DELETE it_vbak_2 FROM 1 TO 5 .
+**********************************************************************
+**Fetch single record from db and load it to work_area
+SELECT SINGLE
+          vbeln
+          ernam
+          erdat
+          vbtyp
+          auart
+          kunnr
+          netwr
+          waerk
+      INTO CORRESPONDING FIELDS OF ls_vbak_2
+      FROM  vbak
+      WHERE vbeln IN s_vbeln.
+**********************************************************************
+**Display error in case of error
+IF sy-subrc <> 0. MESSAGE e003(zsd_msg_cl). ENDIF.
+**********************************************************************
+*define table width
+lv_tbl_wth = 215 .
+lv_tbl_wth2 = lv_tbl_wth / 2 .
+
+
+AT SELECTION-SCREEN OUTPUT.
+
+  lv_active_mn = '' .
+  lv_active_sb = '' .
+
+  CASE 'X'.
+    WHEN p_tytran.      lv_active_mn = 'TRN' .
+    WHEN p_tydele.      lv_active_mn = 'DEL' .
+    WHEN OTHERS.        lv_active_mn = 'OTH' .
+  ENDCASE.
+
+  IF lv_active_mn = 'TRN' .
+    CASE 'X'.
+      WHEN p_trnmnl.    lv_active_sb = 'MNL' .
+      WHEN p_trnapd.    lv_active_sb = 'APD' .
+      WHEN p_trnist.    lv_active_sb = 'IST' .
+      WHEN p_trnclt.    lv_active_sb = 'CLT' .
+      WHEN p_trnmov.    lv_active_sb = 'MOV' .
+      WHEN p_trnmco.    lv_active_sb = 'MCO' .
+      WHEN OTHERS.      lv_active_sb = 'OTH' .
+    ENDCASE.
+  ENDIF.
+
+  LOOP AT SCREEN.
+    IF screen-group1 = '' OR screen-group1 IS INITIAL.
+      CONTINUE.
+    ENDIF.
+
+    lv_opt_show = 0 .
+    IF screen-group1 = lv_active_mn OR
+       screen-group1 = lv_active_sb OR
+       screen-group1 = 'RNG' OR
+       screen-group1 = 'OMN'.
+      lv_opt_show = 1 .
+    ENDIF.
+
+    screen-input      = lv_opt_show .
+    screen-active     = lv_opt_show .
+    screen-invisible  = 1 - lv_opt_show .
+
+    MODIFY SCREEN.
+  ENDLOOP.
+
+
+**********************************************************************
+**********************************************************************
+START-OF-SELECTION.
+**********************************************************************
+**********************************************************************
+
+**********************************************************************
+**Data Transfer Logic
+  CASE lv_active_sb .
+**********************************************************************
+**Data Transfer Using MAnual Transfer
+    WHEN 'MNL' .
+      it_vbak_3 = it_vbak .
+      ls_vbak   = ls_vbak_2 .
+**********************************************************************
+**Data Transfer Using Append
+    WHEN 'APD' .
+**Populating Empty Table
+      APPEND LINES OF it_vbak_2 TO it_vbak_3 .
+**Data Transfer Using Append - WA to IT
+      APPEND ls_vbak_2 TO it_vbak_2 .
+      IF sy-subrc <> 0.   MESSAGE e004(zsd_msg_cl). ENDIF.          "Display error in case of error
+**Data Transfer Using Append
+      IF p_apdfrm IS INITIAL.
+        APPEND LINES OF it_vbak TO it_vbak_3 .
+      ELSEIF p_apd_to IS INITIAL.
+        APPEND LINES OF it_vbak FROM p_apdfrm TO it_vbak_3 .
+      ELSE.
+        APPEND LINES OF it_vbak  FROM p_apdfrm TO p_apd_to TO it_vbak_3 .
+      ENDIF.
+      IF sy-subrc <> 0.   MESSAGE e005(zsd_msg_cl). ENDIF.          "Display error in case of
+**********************************************************************
+**Data Transfer using Insert
+    WHEN 'IST' .
+**Populating Empty Table
+      APPEND LINES OF it_vbak_2 TO it_vbak_3 .
+**Data Transfer using Insert - WA to IT
+      INSERT ls_vbak_2 INTO it_vbak_2  INDEX p_istind.
+      IF sy-subrc <> 0.   MESSAGE e006(zsd_msg_cl). ENDIF.          "Display error in case of error
+**Data Transfer using Insert
+      IF p_istfrm IS INITIAL.
+        INSERT LINES OF it_vbak INTO it_vbak_3 INDEX p_istind.
+      ELSEIF p_ist_to IS INITIAL.
+        INSERT LINES OF it_vbak FROM p_istfrm INTO it_vbak_3 INDEX p_istind .
+      ELSE.
+        INSERT LINES OF it_vbak  FROM p_istfrm TO p_ist_to INTO it_vbak_3 INDEX p_istind .
+      ENDIF.
+      IF sy-subrc <> 0.   MESSAGE e007(zsd_msg_cl). ENDIF.          "Display error in case of error
+
+**********************************************************************
+**Data Transfer using collect
+    WHEN 'CLT' .
+      IF p_clttim > 0 .
+        DO p_clttim TIMES .
+          LOOP AT it_vbak_2 INTO ls_vbak .
+**Data Transfer using collect - WA to IT
+            COLLECT ls_vbak INTO it_vbak_3 .
+          ENDLOOP.
+        ENDDO.
+      ENDIF.
+    WHEN OTHERS .
+  ENDCASE.
+
+
+**Get internal table 1 length
+*DESCRIBE TABLE it_vbak LINES lv_vbak_cnt.
+  lv_vbak_cnt = lines( it_vbak ) .
+**Get internal table 2 length
+  lv_vbak_cnt2 = lines( it_vbak_2 ) .
+**Get internal table 3 length
+  lv_vbak_cnt3 = lines( it_vbak_3 ) .
+**Get internal table varient length
+  lv_vbakv_cnt = lines( it_vbakv ) .
+
+
+  CASE lv_active_sb .
+    WHEN 'MNL' .  WRITE text-mnl.
+    WHEN 'APD' .  WRITE text-apd.
+    WHEN 'IST' .  WRITE text-ist.
+    WHEN OTHERS .
+  ENDCASE.
+  SKIP.
+
+**********************************************************************
+**********************************************************************
+**Print Work Area 1 Title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-019, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**********************************************************************
+**Print Work Area 1 records headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-008,       "Sold-to Party
+           text-009,       "Net Value
+           text-010,       "Document Currency
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area 1 records data
+  WRITE:/ sy-vline ,
+          ls_vbak_2-vbeln UNDER text-003 ,                  "Sales Document
+          ls_vbak_2-ernam UNDER text-004 ,                  "Created By
+          ls_vbak_2-erdat UNDER text-005 ,                  "Creation Date
+          ls_vbak_2-vbtyp UNDER text-006 ,                  "Document Category
+          ls_vbak_2-auart UNDER text-007 ,                  "Sales Document Type
+          ls_vbak_2-kunnr UNDER text-008 ,                  "Sold-to Party
+          ls_vbak_2-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+          ls_vbak_2-waerk UNDER text-010 ,                  "Document Currency
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+  SKIP.
+**********************************************************************
+**Print Work Area Varient Title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-022, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**********************************************************************
+**Print Work Area Varient records headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-009,       "Net Value
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area varient records data
+  WRITE:/ sy-vline ,
+          ls_vbak-vbeln UNDER text-003 ,                  "Sales Document
+          ls_vbak-ernam UNDER text-004 ,                  "Created By
+          ls_vbak-erdat UNDER text-005 ,                  "Creation Date
+          ls_vbak-vbtyp UNDER text-006 ,                  "Document Category
+          ls_vbak-auart UNDER text-007 ,                  "Sales Document Type
+          ls_vbak_2-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+  SKIP.
+**********************************************************************
+**Print Work Area 2 Title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-013, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**********************************************************************
+**Print Work Area 2 records headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-008,       "Sold-to Party
+           text-009,       "Net Value
+           text-010,       "Document Currency
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Work Area 2 records data
+  WRITE:/ sy-vline ,
+          ls_vbak_2-vbeln UNDER text-003 ,                  "Sales Document
+          ls_vbak_2-ernam UNDER text-004 ,                  "Created By
+          ls_vbak_2-erdat UNDER text-005 ,                  "Creation Date
+          ls_vbak_2-vbtyp UNDER text-006 ,                  "Document Category
+          ls_vbak_2-auart UNDER text-007 ,                  "Sales Document Type
+          ls_vbak_2-kunnr UNDER text-008 ,                  "Sold-to Party
+          ls_vbak_2-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+          ls_vbak_2-waerk UNDER text-010 ,                  "Document Currency
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+
+  SKIP.
+
+
+**********************************************************************
+**Print Internal table 1 records Title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-011, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**********************************************************************
+**Print internal table 1 length
+  WRITE : sy-uline(90), / sy-vline, text-002 , lv_vbak_cnt , 90 sy-vline, / sy-uline(90) .
+  SKIP.
+**********************************************************************
+**Print records headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-008,       "Sold-to Party
+           text-009,       "Net Value
+           text-010,       "Document Currency
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print records data
+  LOOP AT it_vbak INTO ls_vbak.
+    WRITE:/ sy-vline ,
+            ls_vbak-vbeln UNDER text-003 ,                  "Sales Document
+            ls_vbak-ernam UNDER text-004 ,                  "Created By
+            ls_vbak-erdat UNDER text-005 ,                  "Creation Date
+            ls_vbak-vbtyp UNDER text-006 ,                  "Document Category
+            ls_vbak-auart UNDER text-007 ,                  "Sales Document Type
+            ls_vbak-kunnr UNDER text-008 ,                  "Sold-to Party
+            ls_vbak-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+            ls_vbak-waerk UNDER text-010 ,                  "Document Currency
+          AT lv_tbl_wth sy-vline,
+          / sy-uline(lv_tbl_wth).
+    FREE ls_vbak.
+  ENDLOOP.
+**If empty
+  IF lv_vbak_cnt = 0 .
+    WRITE:/ sy-vline ,
+            AT lv_tbl_wth2 '-' ,
+            AT lv_tbl_wth sy-vline,
+          / sy-uline(lv_tbl_wth).
+  ENDIF .
+  SKIP.
+
+**********************************************************************
+**Print Internal table 2 Title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-012, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**Print internal table 2 length
+  WRITE : sy-uline(90), / sy-vline, text-014 , lv_vbak_cnt2 , 90 sy-vline, / sy-uline(90) .
+  SKIP.
+**********************************************************************
+**Print records headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-008,       "Sold-to Party
+           text-009,       "Net Value
+           text-010,       "Document Currency
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print records data
+  LOOP AT it_vbak_2 INTO ls_vbak.
+    WRITE:/ sy-vline ,
+            ls_vbak-vbeln UNDER text-003 ,                  "Sales Document
+            ls_vbak-ernam UNDER text-004 ,                  "Created By
+            ls_vbak-erdat UNDER text-005 ,                  "Creation Date
+            ls_vbak-vbtyp UNDER text-006 ,                  "Document Category
+            ls_vbak-auart UNDER text-007 ,                  "Sales Document Type
+            ls_vbak-kunnr UNDER text-008 ,                  "Sold-to Party
+            ls_vbak-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+            ls_vbak-waerk UNDER text-010 ,                  "Document Currency
+          AT lv_tbl_wth sy-vline,
+          / sy-uline(lv_tbl_wth).
+    FREE ls_vbak.
+  ENDLOOP.
+**If empty
+  IF lv_vbak_cnt2 = 0 .
+    WRITE:/ sy-vline ,
+        AT lv_tbl_wth2 '-' ,
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+  ENDIF .
+  SKIP.
+**********************************************************************
+**Print Internal table 3 title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-016, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**Print internal table 3 length
+  WRITE : sy-uline(90), / sy-vline, text-015 , lv_vbak_cnt3 , 90 sy-vline, / sy-uline(90) .
+  SKIP.
+**********************************************************************
+**Print Internal table 3 record headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-008,       "Sold-to Party
+           text-009,       "Net Value
+           text-010,       "Document Currency
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Internal table 3 record data
+  LOOP AT it_vbak_3 INTO ls_vbak.
+    WRITE:/ sy-vline ,
+            ls_vbak-vbeln UNDER text-003 ,                  "Sales Document
+            ls_vbak-ernam UNDER text-004 ,                  "Created By
+            ls_vbak-erdat UNDER text-005 ,                  "Creation Date
+            ls_vbak-vbtyp UNDER text-006 ,                  "Document Category
+            ls_vbak-auart UNDER text-007 ,                  "Sales Document Type
+            ls_vbak-kunnr UNDER text-008 ,                  "Sold-to Party
+            ls_vbak-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+            ls_vbak-waerk UNDER text-010 ,                  "Document Currency
+          AT lv_tbl_wth sy-vline,
+          / sy-uline(lv_tbl_wth).
+    FREE ls_vbak.
+  ENDLOOP.
+**If empty
+  IF lv_vbak_cnt3 = 0 .
+    WRITE:/ sy-vline ,
+        AT lv_tbl_wth2 '-' ,
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+  ENDIF .
+  SKIP.
+**********************************************************************
+**********************************************************************
+**Print Internal table Varient title
+  WRITE : 30 sy-uline(45), /30 sy-vline, text-020, 74 sy-vline, /30 sy-uline(45) .
+  SKIP.
+**Print Internal table Varient length
+  WRITE : sy-uline(90), / sy-vline, text-021 , lv_vbak_cnt3 , 90 sy-vline, / sy-uline(90) .
+  SKIP.
+**Print Internal table varient record headers
+  WRITE:  sy-uline(lv_tbl_wth),
+        / sy-vline ,
+           text-003,       "Sales Document
+           text-004,       "Created By
+           text-005,       "Creation Date
+           text-006,       "Document Category
+           text-007,       "Sales Document Type
+           text-009,       "Net Value
+          AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+**********************************************************************
+**Print Internal table 3 record data
+  LOOP AT it_vbakv INTO ls_vbakv.
+    WRITE:/ sy-vline ,
+            ls_vbakv-vbeln UNDER text-003 ,                  "Sales Document
+            ls_vbakv-ernam UNDER text-004 ,                  "Created By
+            ls_vbakv-erdat UNDER text-005 ,                  "Creation Date
+            ls_vbakv-vbtyp UNDER text-006 ,                  "Document Category
+            ls_vbakv-auart UNDER text-007 ,                  "Sales Document Type
+            ls_vbakv-netwr UNDER text-009 LEFT-JUSTIFIED ,   "Net Value
+          AT lv_tbl_wth sy-vline,
+          / sy-uline(lv_tbl_wth).
+  ENDLOOP.
+**If empty
+  IF lv_vbakv_cnt = 0 .
+    WRITE:/ sy-vline ,
+        AT lv_tbl_wth2 '-' ,
+        AT lv_tbl_wth sy-vline,
+        / sy-uline(lv_tbl_wth).
+  ENDIF .
+  SKIP 3.

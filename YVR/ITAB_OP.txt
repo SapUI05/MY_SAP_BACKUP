@@ -1,0 +1,116 @@
+************************************************************************
+*&                    APPLICATION LOG
+************************************************************************
+*&  AUTHOR      : Ashhad
+*&  CLIENT      : X
+*&  DEPT        : Sales
+*&  MANAGER     : Ahmed
+*&  PACKAGE     : $TMP
+*&  TR          : -
+*&  INTEGRATION : -
+*&  START DATE  : 25TH JULY 2025
+*&  END DATE    : 25TH JULY 2025
+*&  PURPOSE     : Application to perform Delete, Data Access and Describe
+*&                Operations on internal table
+*&**********************************************************************
+*&  MODIFIED BY     |   DATE           |    PACKAGE         |   DESC
+*&**********************************************************************
+*&
+************************************************************************
+REPORT yvr_itab_op NO STANDARD PAGE HEADING.
+**********************************************************************
+DATA : BEGIN       OF   wa_ekpo,
+         ebeln TYPE ekpo-ebeln,
+         ematn TYPE ekpo-ematn,
+         bukrs TYPE ekpo-bukrs,
+         ktmng TYPE ekpo-ktmng,
+         netpr TYPE ekpo-netpr,
+       END         OF   wa_ekpo,
+       it_ekpo     LIKE TABLE OF wa_ekpo,
+       lv_ekpo_cnt TYPE i,
+       lv_ekpo_typ TYPE c,
+       lv_ekpo_mem TYPE i.
+
+FIELD-SYMBOLS <fs_ekpo> LIKE wa_ekpo.
+PARAMETERS : p_ebeln TYPE ekpo-ebeln.
+
+
+SELECT
+  ebeln
+  ematn
+  bukrs
+  ktmng
+  netpr
+      INTO TABLE it_ekpo
+      UP TO 5 ROWS
+      FROM ekpo
+  WHERE ematn > ''
+  AND   ktmng > 0 .
+
+IF sy-subrc <> 0 .
+  MESSAGE e003(zsd_msg_cl).
+ENDIF.
+
+APPEND LINES OF it_ekpo TO it_ekpo .
+
+
+
+WRITE text-bef COLOR 5 .
+DESCRIBE TABLE it_ekpo LINES  lv_ekpo_cnt
+                       KIND lv_ekpo_typ
+                       OCCURS lv_ekpo_mem .
+
+WRITE  :  / text-cnt , lv_ekpo_cnt LEFT-JUSTIFIED ,
+          / text-typ UNDER text-cnt , lv_ekpo_typ  UNDER lv_ekpo_cnt ,
+          / text-mem UNDER text-cnt , lv_ekpo_mem LEFT-JUSTIFIED  UNDER lv_ekpo_cnt ,
+          / sy-uline ,
+            text-001 ,
+            text-002 ,
+            text-003 ,
+            text-004 ,
+            text-005 ,
+          / sy-uline .
+
+LOOP AT it_ekpo ASSIGNING <fs_ekpo>.
+  WRITE  :  / <fs_ekpo>-ebeln UNDER text-001 ,
+              <fs_ekpo>-ematn UNDER text-002 ,
+              <fs_ekpo>-bukrs UNDER text-003 ,
+              <fs_ekpo>-ktmng UNDER text-004 ,
+              <fs_ekpo>-netpr UNDER text-005 ,
+            / sy-uline .
+ENDLOOP.
+
+
+SORT it_ekpo .
+*DELETE ADJACENT DUPLICATES FROM it_ekpo USING KEY EBELN is p_ebeln .
+*DELETE  it_ekpo WHERE EBELN = p_ebeln .
+*DELETE ADJACENT DUPLICATES FROM it_ekpo .
+
+
+SKIP 3 .
+
+WRITE text-aft COLOR 5 .
+DESCRIBE TABLE it_ekpo LINES  lv_ekpo_cnt
+                       KIND lv_ekpo_typ
+                       OCCURS lv_ekpo_mem .
+
+WRITE  :  / text-cnt , lv_ekpo_cnt LEFT-JUSTIFIED ,
+          / text-typ UNDER text-cnt , lv_ekpo_typ  UNDER lv_ekpo_cnt ,
+          / text-mem UNDER text-cnt , lv_ekpo_mem LEFT-JUSTIFIED  UNDER lv_ekpo_cnt ,
+          / sy-uline ,
+            text-001 ,
+            text-002 ,
+            text-003 ,
+            text-004 ,
+            text-005 ,
+          / sy-uline .
+
+LOOP AT it_ekpo ASSIGNING <fs_ekpo> WHERE ebeln = p_ebeln .
+  WRITE  :  / <fs_ekpo>-ebeln UNDER text-001 ,
+              <fs_ekpo>-ematn UNDER text-002 ,
+              <fs_ekpo>-bukrs UNDER text-003 ,
+              <fs_ekpo>-ktmng UNDER text-004 ,
+              <fs_ekpo>-netpr UNDER text-005 ,
+            / sy-uline .
+ENDLOOP.
+SKIP 5 .
